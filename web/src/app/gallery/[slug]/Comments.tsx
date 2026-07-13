@@ -3,7 +3,12 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { ProjectComment } from "@/lib/project";
-import { addComment, editComment, deleteComment } from "./actions";
+import {
+  addComment,
+  editComment,
+  deleteComment,
+  adminDeleteComment,
+} from "./actions";
 
 const field =
   "w-full bg-bg border border-line text-tx text-sm px-3.5 py-3 font-[300] placeholder:text-tx3 focus:outline-none focus:border-line2";
@@ -12,10 +17,12 @@ export default function Comments({
   projectId,
   slug,
   initial,
+  isAdmin = false,
 }: {
   projectId: string;
   slug: string;
   initial: ProjectComment[];
+  isAdmin?: boolean;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -53,6 +60,7 @@ export default function Comments({
               key={c.id}
               comment={c}
               slug={slug}
+              isAdmin={isAdmin}
               active={active?.id === c.id ? active.mode : null}
               setActive={setActive}
               onDone={() => {
@@ -109,6 +117,7 @@ export default function Comments({
 function CommentRow({
   comment,
   slug,
+  isAdmin,
   active,
   setActive,
   onDone,
@@ -117,6 +126,7 @@ function CommentRow({
 }: {
   comment: ProjectComment;
   slug: string;
+  isAdmin: boolean;
   active: "edit" | "delete" | null;
   setActive: (v: { id: string; mode: "edit" | "delete" } | null) => void;
   onDone: () => void;
@@ -167,6 +177,20 @@ function CommentRow({
           >
             삭제
           </button>
+          {isAdmin && (
+            <button
+              type="button"
+              className="text-red-400/80 hover:text-red-400 cursor-pointer"
+              onClick={() =>
+                start(async () => {
+                  await adminDeleteComment(comment.id, slug);
+                  onDone();
+                })
+              }
+            >
+              ✕ 관리자
+            </button>
+          )}
         </span>
       </div>
       <p className="text-tx2 text-sm mt-1">{comment.body}</p>

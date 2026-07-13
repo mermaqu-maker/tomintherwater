@@ -14,7 +14,7 @@ export default function Home() {
             <p className="font-[family-name:var(--font-en)] text-[11px] tracking-[0.42em] uppercase text-accent mb-[22px]">
               Underwater Photography
             </p>
-            <h1 className="font-[family-name:var(--font-en)] font-semibold text-[clamp(36px,5.6vw,74px)] leading-[1.02] tracking-[-0.022em]">
+            <h1 className="font-[family-name:var(--font-en)] font-semibold text-[clamp(28px,7vw,74px)] leading-[1.05] md:leading-[1.02] tracking-[-0.022em]">
               A journey underwater
               <br />
               to meet another Me.

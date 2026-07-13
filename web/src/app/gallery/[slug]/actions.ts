@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth";
 
 type Result = { ok: boolean; error?: string };
 
@@ -54,6 +56,22 @@ export async function editComment(input: {
   if (data !== true) return { ok: false, error: "비밀번호가 일치하지 않습니다." };
 
   revalidatePath(`/gallery/${input.slug}`);
+  return { ok: true };
+}
+
+// 관리자 모더레이션 — 비밀번호 없이 삭제 (RLS is_admin 정책으로 허용)
+export async function adminDeleteComment(
+  commentId: string,
+  slug: string,
+): Promise<Result> {
+  await requireAdmin();
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("project_comments")
+    .delete()
+    .eq("id", commentId);
+  if (error) return { ok: false, error: "삭제에 실패했습니다." };
+  revalidatePath(`/gallery/${slug}`);
   return { ok: true };
 }
 

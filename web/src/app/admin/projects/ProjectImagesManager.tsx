@@ -45,6 +45,9 @@ export default function ProjectImagesManager({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const MAX_BYTES = 30 * 1024 * 1024; // 30MB (사진용)
+  const OK_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
+
   async function onFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
     setError(null);
@@ -52,6 +55,16 @@ export default function ProjectImagesManager({
     const supabase = createClient();
     try {
       for (const file of Array.from(files)) {
+        if (!OK_TYPES.includes(file.type)) {
+          setError(`${file.name}: 이미지 형식만 업로드할 수 있습니다 (jpg/png/webp/avif/gif).`);
+          continue;
+        }
+        if (file.size > MAX_BYTES) {
+          setError(
+            `${file.name}: ${(file.size / 1024 / 1024).toFixed(1)}MB — 최대 30MB까지 업로드할 수 있습니다.`,
+          );
+          continue;
+        }
         const { width, height } = await readDimensions(file);
         const ext = file.name.split(".").pop() ?? "jpg";
         const path = `projects/${projectId}/${crypto.randomUUID()}.${ext}`;

@@ -182,7 +182,12 @@ export default async function ProjectDetailPage({
             </span>
           </div>
         </div>
-        <Comments projectId={project.id} slug={project.slug} initial={comments} />
+        <Comments
+          projectId={project.id}
+          slug={project.slug}
+          initial={comments}
+          isAdmin={!!admin}
+        />
 
         {/* You may also like */}
         {related.length > 0 && (
