@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingButtons from "@/components/FloatingButtons";
+import AdminBar from "@/components/AdminBar";
 
 const archivo = Archivo({
   variable: "--font-archivo",
@@ -32,6 +33,7 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <Footer />
         <FloatingButtons />
+        <AdminBar />
       </body>
     </html>
   );

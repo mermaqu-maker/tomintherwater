@@ -11,6 +11,8 @@ import {
   type ProjectComment,
 } from "@/lib/project";
 import { TYPES } from "@/lib/gallery";
+import { getAdmin } from "@/lib/auth";
+import { deleteProject } from "@/app/admin/projects/actions";
 import ProjectImages from "./ProjectImages";
 import LikeButton from "./LikeButton";
 import Comments from "./Comments";
@@ -45,24 +47,46 @@ export default async function ProjectDetailPage({
   const project = await getProject(slug);
   if (!project) notFound();
 
-  const [comments, adjacent, related] = await Promise.all([
+  const [comments, adjacent, related, admin] = await Promise.all([
     getComments(project.id),
     getAdjacent(project),
     getRelated(project),
+    getAdmin(),
   ]);
 
   const typeLabels = TYPES.filter((t) => project.types.includes(t.key));
+  const del = deleteProject.bind(null, project.id);
 
   return (
     <section className="border-t border-line pt-[130px] pb-[120px]">
       <div className="max-w-[1180px] mx-auto px-8">
-        {/* breadcrumb */}
-        <div className="text-[13px] tracking-[0.16em] uppercase text-tx3 mb-10">
-          <Link href="/gallery" className="hover:text-tx">
-            Gallery
-          </Link>{" "}
-          &nbsp;/&nbsp; {categoryLabel(project.category)} &nbsp;/&nbsp;{" "}
-          <span className="text-tx2">{project.title}</span>
+        {/* breadcrumb + 관리자 편집 */}
+        <div className="flex items-center justify-between gap-4 flex-wrap mb-10">
+          <div className="text-[13px] tracking-[0.16em] uppercase text-tx3">
+            <Link href="/gallery" className="hover:text-tx">
+              Gallery
+            </Link>{" "}
+            &nbsp;/&nbsp; {categoryLabel(project.category)} &nbsp;/&nbsp;{" "}
+            <span className="text-tx2">{project.title}</span>
+          </div>
+          {admin && (
+            <div className="flex gap-2">
+              <Link
+                href={`/admin/projects/${project.id}/edit`}
+                className="text-[11px] tracking-[0.14em] uppercase text-tx2 border border-line2 px-3.5 py-2 hover:text-accent hover:border-accent"
+              >
+                ✎ 수정
+              </Link>
+              <form action={del}>
+                <button
+                  type="submit"
+                  className="text-[11px] tracking-[0.14em] uppercase text-red-400 border border-red-400/40 px-3.5 py-2 hover:bg-red-400/10 cursor-pointer"
+                >
+                  ✕ 삭제
+                </button>
+              </form>
+            </div>
+          )}
         </div>
 
         {/* spotlight: 좌 이미지 / 우 설명 */}

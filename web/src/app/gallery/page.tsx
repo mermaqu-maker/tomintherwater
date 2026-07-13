@@ -9,6 +9,7 @@ import {
   type Category,
   type GalleryCard,
 } from "@/lib/gallery";
+import { getAdmin } from "@/lib/auth";
 
 export const metadata: Metadata = { title: "Gallery" };
 
@@ -43,9 +44,10 @@ export default async function GalleryPage({
   const place = sp.place || undefined;
   const year = sp.year ? Number(sp.year) : undefined;
 
-  const [projects, facets] = await Promise.all([
+  const [projects, facets, admin] = await Promise.all([
     getGalleryProjects({ category, type, place, year }),
     getFacets(category),
+    getAdmin(),
   ]);
 
   const hasAnyPublished =
@@ -56,6 +58,13 @@ export default async function GalleryPage({
   return (
     <section className="border-t border-line pt-[150px] pb-[120px]">
       <div className="max-w-[1180px] mx-auto px-8">
+        {admin && (
+          <div className="flex justify-end mb-4">
+            <Link href="/admin/projects/new" className="btn-line">
+              ＋ 새 프로젝트
+            </Link>
+          </div>
+        )}
         {/* 타이틀 + 카테고리 탭 */}
         <div className="text-center mb-11">
           <p className="font-en text-[11px] tracking-[0.34em] uppercase text-accent">
