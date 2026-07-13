@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingButtons from "@/components/FloatingButtons";
 import AdminBar from "@/components/AdminBar";
+import SmoothScroll from "@/components/SmoothScroll";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/site";
 
 const archivo = Archivo({
@@ -43,6 +44,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${archivo.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
+        <SmoothScroll />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

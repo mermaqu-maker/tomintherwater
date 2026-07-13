@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { createProject, updateProject, type ProjectInput } from "./actions";
+import { updateProject, type ProjectInput } from "./actions";
 
 const field =
   "w-full bg-bg2 border border-line text-tx text-sm px-3.5 py-2.5 font-[300] placeholder:text-tx3 focus:outline-none focus:border-line2";
@@ -14,30 +14,18 @@ const ALL_TYPES = [
   { key: "commercial", label: "Commercial" },
 ] as const;
 
-function slugify(s: string) {
-  return s
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
-}
-
 type Props = {
-  mode: "new" | "edit";
-  projectId?: string;
+  projectId: string;
   initial?: Partial<ProjectInput>;
 };
 
-export default function ProjectForm({ mode, projectId, initial }: Props) {
+export default function ProjectForm({ projectId, initial }: Props) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
-  const [slugTouched, setSlugTouched] = useState(mode === "edit");
 
   const [f, setF] = useState<ProjectInput>({
-    slug: initial?.slug ?? "",
     title: initial?.title ?? "",
     category: initial?.category ?? "in_water",
     types: initial?.types ?? [],
@@ -52,10 +40,6 @@ export default function ProjectForm({ mode, projectId, initial }: Props) {
   const set = <K extends keyof ProjectInput>(k: K, v: ProjectInput[K]) =>
     setF((p) => ({ ...p, [k]: v }));
 
-  function onTitle(v: string) {
-    set("title", v);
-    if (!slugTouched) set("slug", slugify(v));
-  }
   function toggleType(t: string) {
     set(
       "types",
@@ -67,35 +51,22 @@ export default function ProjectForm({ mode, projectId, initial }: Props) {
     setError(null);
     setSaved(false);
     start(async () => {
-      if (mode === "new") {
-        const r = await createProject(f);
-        if (r.error) return setError(r.error);
-        router.push(`/admin/projects/${r.id}/edit`);
-      } else {
-        const r = await updateProject(projectId!, f);
-        if (!r.ok) return setError(r.error ?? "오류");
-        setSaved(true);
-        router.refresh();
-      }
+      const r = await updateProject(projectId, f);
+      if (!r.ok) return setError(r.error ?? "오류");
+      setSaved(true);
+      router.refresh();
     });
   }
 
   return (
     <div className="grid md:grid-cols-2 gap-4">
-      <div>
+      <div className="md:col-span-2">
         <label className={lbl}>제목</label>
-        <input className={field} value={f.title} onChange={(e) => onTitle(e.target.value)} />
-      </div>
-      <div>
-        <label className={lbl}>슬러그 (URL · 영문/숫자)</label>
         <input
           className={field}
-          value={f.slug}
-          onChange={(e) => {
-            setSlugTouched(true);
-            set("slug", e.target.value);
-          }}
-          placeholder="temptation-of-siren"
+          value={f.title}
+          onChange={(e) => set("title", e.target.value)}
+          placeholder="예: Temptation of Siren"
         />
       </div>
 
@@ -113,7 +84,7 @@ export default function ProjectForm({ mode, projectId, initial }: Props) {
         <label className={lbl}>촬영 일시</label>
         <input
           type="date"
-          className={field}
+          className={`${field} [color-scheme:dark]`}
           value={f.shot_date ?? ""}
           onChange={(e) => set("shot_date", e.target.value || null)}
         />
@@ -148,22 +119,23 @@ export default function ProjectForm({ mode, projectId, initial }: Props) {
         <input className={field} value={f.gear ?? ""} onChange={(e) => set("gear", e.target.value)} />
       </div>
 
-      {mode === "edit" && (
-        <div className="md:col-span-2">
-          <label className={lbl}>공개 여부</label>
-          <div className="flex gap-2">
-            <Chip on={f.published} onClick={() => set("published", true)}>공개</Chip>
-            <Chip on={!f.published} onClick={() => set("published", false)}>비공개</Chip>
-          </div>
+      <div className="md:col-span-2">
+        <label className={lbl}>공개 여부</label>
+        <div className="flex gap-2">
+          <Chip on={f.published} onClick={() => set("published", true)}>공개</Chip>
+          <Chip on={!f.published} onClick={() => set("published", false)}>비공개</Chip>
         </div>
-      )}
+        <p className="text-[12px] text-tx3 mt-2">
+          공개로 두고 저장하면 갤러리에 바로 노출됩니다. 사진을 먼저 올리고 공개로 바꿔도 됩니다.
+        </p>
+      </div>
 
       {error && <p className="md:col-span-2 text-[13px] text-red-400">{error}</p>}
       {saved && <p className="md:col-span-2 text-[13px] text-accent">저장되었습니다.</p>}
 
       <div className="md:col-span-2 flex justify-end">
         <button type="button" onClick={submit} disabled={pending} className="cta-solid disabled:opacity-50">
-          {mode === "new" ? "만들기 → 이미지 추가" : pending ? "저장 중…" : "저장"}
+          {pending ? "저장 중…" : "저장"}
         </button>
       </div>
     </div>

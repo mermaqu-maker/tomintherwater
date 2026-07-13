@@ -59,10 +59,8 @@ export default async function EditProjectPage({
       </h1>
 
       <ProjectForm
-        mode="edit"
         projectId={id}
         initial={{
-          slug: p.slug,
           title: p.title,
           category: p.category,
           types: p.types ?? [],

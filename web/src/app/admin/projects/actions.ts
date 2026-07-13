@@ -4,9 +4,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type ProjectInput = {
-  slug: string;
   title: string;
   category: "in_water" | "on_water";
   types: string[];
@@ -18,44 +18,57 @@ export type ProjectInput = {
   published: boolean;
 };
 
-function normalize(input: ProjectInput) {
-  return {
-    slug: input.slug.trim(),
-    title: input.title.trim(),
-    category: input.category,
-    types: input.types,
-    shot_date: input.shot_date || null,
-    caption: input.caption?.trim() || null,
-    location: input.location?.trim() || null,
-    collaborators: input.collaborators?.trim() || null,
-    gear: input.gear?.trim() || null,
-    published: input.published,
-  };
+function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
-export async function createProject(
-  input: ProjectInput,
-): Promise<{ id?: string; error?: string }> {
-  await requireAdmin();
-  const n = normalize(input);
-  if (!n.slug || !n.title) return { error: "슬러그와 제목은 필수입니다." };
+async function uniqueSlug(
+  supabase: SupabaseClient,
+  base: string,
+  excludeId: string,
+): Promise<string> {
+  const root = base || "project";
+  let candidate = root;
+  let n = 1;
+  // 충돌 시 -2, -3 …
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const { data } = await supabase
+      .from("projects")
+      .select("id")
+      .eq("slug", candidate)
+      .neq("id", excludeId)
+      .maybeSingle();
+    if (!data) return candidate;
+    n += 1;
+    candidate = `${root}-${n}`;
+  }
+}
 
+// "+ 새 프로젝트" → 빈 초안을 만들고 곧바로 편집 화면으로 (1단계 UX)
+export async function createDraft(): Promise<void> {
+  await requireAdmin();
   const supabase = await createClient();
+  const slug = `draft-${crypto.randomUUID().slice(0, 8)}`;
   const { data, error } = await supabase
     .from("projects")
-    .insert({ ...n, published: false })
+    .insert({
+      title: "제목 없음",
+      slug,
+      category: "in_water",
+      published: false,
+    })
     .select("id")
     .single();
-
-  if (error)
-    return {
-      error:
-        error.code === "23505"
-          ? "이미 사용 중인 슬러그입니다."
-          : "생성에 실패했습니다.",
-    };
+  if (error || !data) throw new Error("초안 생성 실패");
   revalidatePath("/admin/projects");
-  return { id: data.id };
+  redirect(`/admin/projects/${data.id}/edit`);
 }
 
 export async function updateProject(
@@ -63,19 +76,39 @@ export async function updateProject(
   input: ProjectInput,
 ): Promise<{ ok: boolean; error?: string }> {
   await requireAdmin();
-  const n = normalize(input);
-  if (!n.slug || !n.title) return { ok: false, error: "슬러그와 제목은 필수입니다." };
+  const title = input.title.trim();
+  if (!title) return { ok: false, error: "제목은 필수입니다." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("projects").update(n).eq("id", id);
-  if (error)
-    return {
-      ok: false,
-      error:
-        error.code === "23505"
-          ? "이미 사용 중인 슬러그입니다."
-          : "저장에 실패했습니다.",
-    };
+
+  // 슬러그: 백엔드에서만 관리. 초안(draft-) 상태면 제목 기준으로 확정, 이후 고정.
+  const { data: cur } = await supabase
+    .from("projects")
+    .select("slug")
+    .eq("id", id)
+    .single();
+  let slug = cur?.slug ?? "";
+  if (!slug || slug.startsWith("draft-")) {
+    slug = await uniqueSlug(supabase, slugify(title), id);
+  }
+
+  const { error } = await supabase
+    .from("projects")
+    .update({
+      slug,
+      title,
+      category: input.category,
+      types: input.types,
+      shot_date: input.shot_date || null,
+      caption: input.caption?.trim() || null,
+      location: input.location?.trim() || null,
+      collaborators: input.collaborators?.trim() || null,
+      gear: input.gear?.trim() || null,
+      published: input.published,
+    })
+    .eq("id", id);
+  if (error) return { ok: false, error: "저장에 실패했습니다." };
+
   revalidatePath("/admin/projects");
   revalidatePath("/gallery");
   return { ok: true };
@@ -84,7 +117,6 @@ export async function updateProject(
 export async function deleteProject(id: string): Promise<void> {
   await requireAdmin();
   const supabase = await createClient();
-  // storage 파일 정리
   const { data: imgs } = await supabase
     .from("project_images")
     .select("path")
@@ -135,7 +167,6 @@ export async function removeProjectImage(
     .single();
   await supabase.from("project_images").delete().eq("id", imageId);
   if (img?.path) await supabase.storage.from("media").remove([img.path]);
-  // 대표가 삭제되면 남은 첫 이미지를 대표로
   if (img?.is_cover) {
     const { data: first } = await supabase
       .from("project_images")
@@ -144,7 +175,8 @@ export async function removeProjectImage(
       .order("sort_order", { ascending: true })
       .limit(1)
       .maybeSingle();
-    if (first) await supabase.from("project_images").update({ is_cover: true }).eq("id", first.id);
+    if (first)
+      await supabase.from("project_images").update({ is_cover: true }).eq("id", first.id);
   }
   revalidatePath(`/admin/projects/${projectId}/edit`);
   revalidatePath("/gallery");

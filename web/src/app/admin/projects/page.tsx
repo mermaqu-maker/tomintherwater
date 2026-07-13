@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { createDraft } from "./actions";
 
 export const metadata = { title: "프로젝트 관리" };
 
@@ -25,9 +26,11 @@ export default async function AdminProjectsPage() {
             프로젝트 관리
           </h1>
         </div>
-        <Link href="/admin/projects/new" className="cta-solid">
-          ＋ 새 프로젝트
-        </Link>
+        <form action={createDraft}>
+          <button type="submit" className="cta-solid">
+            ＋ 새 프로젝트
+          </button>
+        </form>
       </div>
 
       {projects.length === 0 ? (

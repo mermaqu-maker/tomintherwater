@@ -94,6 +94,18 @@ export default function Footer() {
           ))}
         </nav>
       </div>
+
+      <div className="max-w-[1180px] mx-auto px-8 mt-14 pt-6 border-t border-line/60 flex items-center justify-between">
+        <span className="text-[11px] tracking-[0.14em] text-tx3">
+          © 2026 TOM IN THE WATER
+        </span>
+        <Link
+          href="/admin/login"
+          className="text-[11px] tracking-[0.16em] uppercase text-tx3/70 transition-colors hover:text-tx2"
+        >
+          Admin
+        </Link>
+      </div>
     </footer>
   );
 }

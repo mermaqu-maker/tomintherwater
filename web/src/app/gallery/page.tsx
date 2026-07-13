@@ -10,6 +10,8 @@ import {
   type GalleryCard,
 } from "@/lib/gallery";
 import { getAdmin } from "@/lib/auth";
+import { createDraft } from "@/app/admin/projects/actions";
+import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = { title: "Gallery" };
 
@@ -60,9 +62,11 @@ export default async function GalleryPage({
       <div className="max-w-[1180px] mx-auto px-8">
         {admin && (
           <div className="flex justify-end mb-4">
-            <Link href="/admin/projects/new" className="btn-line">
-              ＋ 새 프로젝트
-            </Link>
+            <form action={createDraft}>
+              <button type="submit" className="btn-line">
+                ＋ 새 프로젝트
+              </button>
+            </form>
           </div>
         )}
         {/* 타이틀 + 카테고리 탭 */}
@@ -142,8 +146,14 @@ export default async function GalleryPage({
         {/* 그리드 / 빈 상태 */}
         {projects.length > 0 ? (
           <div className="[column-count:2] [column-gap:22px] max-[780px]:[column-count:1]">
-            {projects.map((p) => (
-              <GalleryTile key={p.slug} card={p} />
+            {projects.map((p, i) => (
+              <Reveal
+                key={p.slug}
+                delay={Math.min(i, 5) * 80}
+                className="break-inside-avoid"
+              >
+                <GalleryTile card={p} />
+              </Reveal>
             ))}
           </div>
         ) : isFiltered ? (

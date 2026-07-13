@@ -38,7 +38,8 @@ export async function signIn(
 export async function signOut(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect("/");
+  // 로그아웃 후 다시 로그인 지점을 바로 찾을 수 있도록 로그인 화면으로 이동
+  redirect("/admin/login");
 }
 
 export async function requestReset(

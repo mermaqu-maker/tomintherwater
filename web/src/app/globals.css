@@ -39,6 +39,21 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Lenis 관성 스크롤 (SmoothScroll.tsx) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
 body {
   background: var(--bg);
   color: var(--tx);
@@ -91,6 +106,30 @@ body {
 }
 .cta-solid:hover {
   background: #9ad6e2;
+}
+
+/* 히어로 배경 미세 드리프트 + 스크롤 큐 */
+@keyframes heroDrift {
+  from {
+    transform: scale(1.04) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.1) translate3d(-1.5%, -1%, 0);
+  }
+}
+@keyframes scrollCue {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(200%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-\[heroDrift_22s_ease-in-out_infinite_alternate\],
+  .animate-\[scrollCue_2\.2s_ease-in-out_infinite\] {
+    animation: none !important;
+  }
 }
 
 /* 스크롤 리빌 — reduced-motion 대응 */
