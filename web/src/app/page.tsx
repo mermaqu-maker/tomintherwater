@@ -14,13 +14,13 @@ export default function Home() {
             <p className="font-[family-name:var(--font-en)] text-[11px] tracking-[0.42em] uppercase text-accent mb-[22px]">
               Underwater Photography
             </p>
-            <h1 className="font-[family-name:var(--font-en)] font-semibold text-[clamp(28px,7vw,74px)] leading-[1.05] md:leading-[1.02] tracking-[-0.022em]">
-              A journey underwater
-              <br />
-              to meet another Me.
+            <h1 className="font-[family-name:var(--font-en)] font-semibold text-[clamp(23px,3.1vw,40px)] leading-[1.18] md:leading-[1.12] tracking-[-0.015em] max-w-[880px]">
+              Capturing the journey to another self,
+              <br className="hidden sm:block" /> found in a different world
+              underwater.
             </h1>
-            <p className="mt-[22px] max-w-[440px] text-[15px] text-tx2">
-              물이라는 다른 차원에서 만나는 또 다른 나. 그 여정을 기록합니다.
+            <p className="mt-[22px] max-w-[540px] text-[15px] text-tx2">
+              물속이라는 다른 세상에서 마주한 또 다른 나, 그 여정을 담아냅니다.
             </p>
           </div>
         </div>
