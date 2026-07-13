@@ -22,7 +22,7 @@ const SITEMAP = [
     links: [
       { label: "About", href: "/about" },
       { label: "Reviews", href: "/reviews" },
-      { label: "의상 대여", href: "/costumes" },
+      { label: "Rental", href: "/costumes" },
     ],
   },
 ];

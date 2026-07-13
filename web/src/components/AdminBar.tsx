@@ -15,6 +15,9 @@ export default async function AdminBar() {
         <Link href="/admin/projects" className="text-tx2 hover:text-tx uppercase tracking-[0.1em]">
           프로젝트
         </Link>
+        <Link href="/admin/products" className="text-tx2 hover:text-tx uppercase tracking-[0.1em]">
+          상품
+        </Link>
         <Link href="/admin/costumes" className="text-tx2 hover:text-tx uppercase tracking-[0.1em]">
           의상
         </Link>

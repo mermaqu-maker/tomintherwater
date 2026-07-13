@@ -1,14 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { mediaUrl } from "@/lib/media";
+import type { CourseGroup, PriceKind } from "@/lib/course-meta";
 
-export type CourseGroup = "essential" | "special" | "group";
-export type PriceKind = "fixed" | "from" | "inquire" | "coming";
-
-export const GROUPS: { key: CourseGroup; label: string; caption: string }[] = [
-  { key: "essential", label: "Essential", caption: "기본 촬영" },
-  { key: "special", label: "Special", caption: "특별 촬영" },
-  { key: "group", label: "Group & Commercial", caption: "그룹 · 이벤트 · 상업" },
-];
+export type { CourseGroup, PriceKind } from "@/lib/course-meta";
+export { GROUPS, PRICE_KINDS } from "@/lib/course-meta";
 
 export type Product = {
   id: string;
