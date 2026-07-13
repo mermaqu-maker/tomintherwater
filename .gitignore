@@ -2,4 +2,8 @@ node_modules/
 .next/
 .DS_Store
 .env*
+!.env.example
 .vercel
+
+# 디자인 탐색용 프로토타입 (디스크엔 남기고 커밋 제외)
+mockup/_scratch/
