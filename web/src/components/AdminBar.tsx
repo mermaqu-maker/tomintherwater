@@ -13,7 +13,10 @@ export default async function AdminBar() {
       관리자 · {admin.email}
       <span className="ml-auto flex gap-5 items-center">
         <Link href="/admin/projects" className="text-tx2 hover:text-tx uppercase tracking-[0.1em]">
-          프로젝트 관리
+          프로젝트
+        </Link>
+        <Link href="/admin/costumes" className="text-tx2 hover:text-tx uppercase tracking-[0.1em]">
+          의상
         </Link>
         <form action={signOut}>
           <button

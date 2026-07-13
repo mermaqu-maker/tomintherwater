@@ -1,8 +1,15 @@
 // 홈 — 히어로 + Featured Work (콘텐츠는 이 두 섹션만, docs/01 §2.1)
-// M1: 레이아웃/토큰 검증용 플레이스홀더. M2에서 Supabase featured_projects 연동.
+import Link from "next/link";
 import Reveal from "@/components/Reveal";
+import { getFeatured, getFeaturableProjects } from "@/lib/featured";
+import { getAdmin } from "@/lib/auth";
+import FeaturedManager, { Tile } from "@/components/FeaturedManager";
 
-export default function Home() {
+export default async function Home() {
+  const [featured, admin] = await Promise.all([getFeatured(), getAdmin()]);
+  const featurable = admin ? await getFeaturableProjects() : [];
+  const showFeatured = admin || featured.length > 0;
+
   return (
     <>
       {/* 히어로 — 이미지가 무대. 실제 배경(영상/대표작)은 M2에서 */}
@@ -44,31 +51,43 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Work — M2에서 Masonry + hover 오버레이로 대체 */}
-      <section className="border-t border-line py-[120px]">
-        <div className="max-w-[1180px] mx-auto px-8">
-          <Reveal>
-            <div className="flex justify-between items-baseline mb-11">
-              <div>
-                <p className="font-[family-name:var(--font-en)] text-[11px] tracking-[0.34em] uppercase text-accent">
-                  Selected
-                </p>
-                <h2 className="font-[family-name:var(--font-en)] font-semibold text-[clamp(26px,3.2vw,40px)] tracking-[-0.015em] mt-1.5">
-                  Featured Work
-                </h2>
+      {/* Featured Work — featured_projects 연동 (관리자 −/＋ 관리) */}
+      {showFeatured && (
+        <section className="border-t border-line py-[120px]">
+          <div className="max-w-[1180px] mx-auto px-8">
+            <Reveal>
+              <div className="flex justify-between items-baseline mb-11">
+                <div>
+                  <p className="font-[family-name:var(--font-en)] text-[11px] tracking-[0.34em] uppercase text-accent">
+                    Selected
+                  </p>
+                  <h2 className="font-[family-name:var(--font-en)] font-semibold text-[clamp(26px,3.2vw,40px)] tracking-[-0.015em] mt-1.5">
+                    Featured Work
+                  </h2>
+                </div>
+                <Link
+                  href="/gallery"
+                  className="font-[family-name:var(--font-en)] text-[11px] tracking-[0.2em] uppercase text-tx3 hover:text-accent transition-colors"
+                >
+                  갤러리 전체 보기 →
+                </Link>
               </div>
-              <span className="font-[family-name:var(--font-en)] text-[11px] tracking-[0.2em] uppercase text-tx3">
-                In / On the Water
-              </span>
-            </div>
-          </Reveal>
-          <Reveal delay={120}>
-            <p className="text-tx3 text-sm">
-              M2에서 Supabase 연동 후 대표 작업이 여기에 표시됩니다.
-            </p>
-          </Reveal>
-        </div>
-      </section>
+            </Reveal>
+
+            {admin ? (
+              <FeaturedManager featured={featured} featurable={featurable} />
+            ) : (
+              <div className="grid gap-[22px] sm:grid-cols-2">
+                {featured.map((c, i) => (
+                  <Reveal key={c.projectId} delay={Math.min(i, 4) * 80}>
+                    <Tile card={c} />
+                  </Reveal>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
     </>
   );
 }
