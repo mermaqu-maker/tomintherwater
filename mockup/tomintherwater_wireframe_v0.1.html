@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tom in the Water — 와이어프레임 목업</title>
+<style>
+  :root{
+    --bg:#f4f4f2; --surface:#fff; --line:#cfcfc9; --line2:#b3b3ac;
+    --ink:#3a3a37; --ink2:#7a7a74; --ink3:#a4a49d;
+    --kakao-bg:#fbe9a6; --kakao-ink:#7a5c00;
+    --admin:#2f6fd6; --admin-bg:#eaf1fc; --danger:#c0453c; --danger-bg:#fbeceb;
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo",Roboto,"Malgun Gothic",sans-serif;
+    font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+  .muted{color:var(--ink2)} .dim{color:var(--ink3)} .center{text-align:center}
+
+  .ph{border:1px dashed var(--line2);border-radius:8px;background:
+      linear-gradient(45deg,transparent 46%,#e4e4de 46%,#e4e4de 54%,transparent 54%);
+      background-size:16px 16px;background-color:#fafaf8;
+      display:flex;align-items:center;justify-content:center;color:var(--ink3);
+      font-size:12px;letter-spacing:.04em;text-align:center;padding:6px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+  .chip{display:inline-block;font-size:12px;color:var(--ink2);border:1px solid var(--line);
+      border-radius:20px;padding:3px 12px;cursor:pointer;user-select:none;background:var(--surface)}
+  .chip.on{color:var(--ink);border-color:var(--line2);background:#efefe9}
+  .btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink);
+      border:1px solid var(--line2);border-radius:8px;padding:8px 16px;background:var(--surface);cursor:pointer}
+  .btn:hover{background:#efefe9}
+  .kbtn{background:var(--kakao-bg);color:var(--kakao-ink);border:none}
+  .tag{font-size:11px;color:var(--ink3);letter-spacing:.06em;margin-bottom:12px}
+  .sec{padding:34px 0;border-bottom:1px solid var(--line)}
+  h1,h2,h3{font-weight:600;color:var(--ink);margin:0}
+  .stars{color:#caa53a;letter-spacing:2px}
+  .rate{display:inline-flex;gap:4px;font-size:26px;color:#d8d5cc;cursor:pointer;line-height:1}
+  .rate span{transition:color .1s} .rate span.on{color:#caa53a}
+  .rbadge{font-size:10px;background:#eef2f8;color:#3a5578;border:0.5px solid #d6e0ee;border-radius:6px;padding:2px 8px}
+  .dot{width:15px;height:15px;border-radius:50%;border:1px solid var(--line2);display:inline-block;vertical-align:middle}
+
+  header{position:sticky;top:0;z-index:40;background:rgba(244,244,242,.92);
+      backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+  header .wrap{display:flex;align-items:center;height:58px;gap:18px}
+  .logo{font-weight:600;letter-spacing:.12em;font-size:15px}
+  nav{margin-left:auto;display:flex;gap:6px;font-size:13px}
+  .navitem{position:relative}
+  .navitem>a{display:block;padding:18px 14px;color:var(--ink2);letter-spacing:.03em}
+  .navitem>a.active,.navitem:hover>a{color:var(--ink);font-weight:600}
+  .drop{position:absolute;top:100%;left:50%;transform:translateX(-50%);min-width:210px;
+      background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px;
+      box-shadow:0 8px 24px rgba(0,0,0,.08);display:none;flex-direction:column;gap:2px}
+  .navitem:hover .drop{display:flex}
+  .drop a{padding:9px 12px;border-radius:7px;color:var(--ink);font-weight:500;white-space:nowrap}
+  .drop a:hover{background:#efefe9}
+  .drop a small{display:block;color:var(--ink3);font-weight:400;font-size:11px;margin-top:1px}
+
+  .page{display:none} .page.active{display:block}
+
+  .hero{height:72vh;min-height:440px;border-radius:14px;margin-top:22px}
+  .hero .inner{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}
+  .hero h1{font-size:28px;font-weight:500}
+
+  .gwrap{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .gcard{position:relative;border-radius:10px;overflow:hidden;cursor:pointer}
+  .gcard .ph{height:250px;border-radius:0}
+  .gcard .ov{position:absolute;inset:0;display:flex;align-items:flex-end;padding:18px;
+      color:#fff;opacity:0;background:rgba(0,0,0,0);transition:.25s}
+  .gcard:hover .ov{opacity:1;background:rgba(0,0,0,.46)}
+  .gcard .ov b{font-size:16px;font-weight:600} .gcard .ov span{color:#e7e7e7;font-size:12px}
+  .fremove{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;
+      background:rgba(0,0,0,.62);color:#fff;border:none;display:none;align-items:center;justify-content:center;
+      font-size:20px;line-height:1;cursor:pointer;z-index:3}
+  body.admin .fremove{display:flex}
+  .addtile{border:2px dashed var(--admin);border-radius:10px;min-height:250px;display:none;
+      align-items:center;justify-content:center;flex-direction:column;gap:6px;color:var(--admin);
+      cursor:pointer;background:var(--admin-bg);font-size:13px}
+  .addtile .plus{font-size:30px;line-height:1}
+  body.admin .addtile{display:flex}
+
+  .rel{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .rel .gcard .ph{height:130px}
+  .rel .gcard .ov{padding:10px} .rel .gcard .ov b{font-size:12px}
+
+  /* masonry: mixed portrait/landscape, 2 columns */
+  .masonry{column-count:2;column-gap:14px}
+  .masonry>.gcard{break-inside:avoid;margin-bottom:14px;display:block;width:100%}
+  .masonry .gcard .ph{height:auto}
+  .masonry>.ph{break-inside:avoid;margin-bottom:14px;width:100%;height:auto}
+
+  .seg{display:inline-flex;border:1px solid var(--line2);border-radius:30px;overflow:hidden;background:var(--surface)}
+  .seg button{border:none;background:none;padding:11px 24px;font-size:14px;color:var(--ink2);cursor:pointer}
+  .seg button.on{background:var(--ink);color:#fff;font-weight:600}
+
+  .dhero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:30px;align-items:start}
+  .dhero .imgcol .ph{width:100%;aspect-ratio:3/4;height:auto}
+  .tiles2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .tiles2 .ph{height:230px;cursor:zoom-in}
+
+  .frow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .flabel{font-size:11px;color:var(--ink3);width:70px}
+
+  .admin-only{display:none} body.admin .admin-only{display:inline-flex}
+  .admin-tag{font-size:12px;color:var(--admin);border:1px dashed var(--admin);background:var(--admin-bg);
+      border-radius:8px;padding:5px 10px;align-items:center;gap:5px}
+  .admin-del{color:var(--danger);border-color:var(--danger);background:var(--danger-bg)}
+
+  .field{border:1px solid var(--line2);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--ink2);
+      background:var(--surface);width:100%;font-family:inherit}
+  .lbl{font-size:11px;color:var(--ink3);margin-bottom:5px;display:block}
+
+  .prod{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);border:1px solid var(--line);
+      border-radius:16px;overflow:hidden;background:var(--surface);margin-bottom:24px;scroll-margin-top:80px}
+  .prod .imgside .ph{height:100%;min-height:300px;border-radius:0;border:none}
+  .prod .body{padding:28px}
+  .ptitle{font-size:21px;font-weight:600;line-height:1.3}
+  .psub{color:var(--ink2);margin:6px 0 16px}
+  .pfeat{list-style:none;padding:0;margin:0 0 18px}
+  .pfeat li{padding:6px 0;border-bottom:1px dashed var(--line);font-size:13.5px;display:flex;gap:8px}
+  .pfeat li::before{content:"•";color:var(--ink3)}
+  .price{display:inline-block;background:#f2efe6;border:1px solid #e4dcc4;color:#6b5a1e;
+      font-size:18px;font-weight:600;border-radius:10px;padding:10px 18px}
+  .pnote{font-size:12px;color:var(--ink3);margin-top:8px}
+  .coming{opacity:.75} .coming .ptitle{color:var(--ink2)}
+  .crosscard{display:grid;grid-template-columns:90px 1fr;gap:14px;align-items:center;
+      border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--surface);cursor:pointer}
+  .crosscard .ph{height:64px}
+  .crosscard:hover{border-color:var(--line2);background:#faf9f6}
+
+  .ccard{padding:12px} .ccard .ph{height:150px;margin-bottom:10px}
+  .courseChip{font-size:10px;background:#eef2f8;color:#3a5578;border:1px solid #d6e0ee;border-radius:6px;padding:2px 7px}
+
+  .inquiry{text-align:center;padding:30px 20px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+
+  footer{background:#ededea}
+  footer .wrap{display:flex;justify-content:space-between;align-items:flex-start;padding:34px 20px;gap:30px;flex-wrap:wrap}
+  .ficon{display:inline-flex;align-items:center;justify-content:center;color:var(--ink2);cursor:pointer}
+  .ficon:hover{color:var(--ink)} .ficon svg{width:19px;height:19px}
+  .sitemap{display:flex;gap:40px;flex-wrap:wrap}
+  .scol{display:flex;flex-direction:column;gap:8px}
+  .scol .sh{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:2px}
+  .scol a{font-size:13px;color:var(--ink2)} .scol a:hover{color:var(--ink)}
+
+  .fabs{position:fixed;right:20px;bottom:24px;z-index:50;display:flex;flex-direction:column;gap:10px}
+  .fab{width:48px;height:48px;border-radius:50%;border:1px solid var(--line2);background:var(--surface);
+      display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink)}
+  .fab svg{width:20px;height:20px} .fab.k{background:var(--kakao-bg);color:var(--kakao-ink);border:none}
+  .fab:hover{filter:brightness(.97)}
+
+  .adminswitch{position:fixed;left:16px;bottom:18px;z-index:50;font-size:12px;color:var(--ink2);
+      background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:6px 12px;
+      display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+  body.admin #adminLoginBtn{display:none}
+  .adminbar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--ink);color:#fff;
+      display:none;align-items:center;gap:10px;padding:11px 18px;font-size:13px}
+  body.admin .adminbar{display:flex} body.admin .fabs{bottom:64px}
+  .adot{width:8px;height:8px;border-radius:50%;background:#5ac37a;display:inline-block}
+  .abar-r{margin-left:auto;display:flex;gap:16px;align-items:center}
+  .alogout{opacity:.8;cursor:pointer;text-decoration:underline}
+  .dbtn{background:var(--danger);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer}
+  .pbtn{background:var(--ink);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .upload{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+  .upload .ph{height:56px}
+
+  /* modal (shared) */
+  .modal{position:fixed;inset:0;z-index:70;background:rgba(20,20,22,.55);display:none;
+      align-items:center;justify-content:center;padding:24px}
+  .modal.open{display:flex}
+  .modal-box{background:var(--surface);border-radius:16px;width:100%;max-width:640px;max-height:86vh;
+      overflow:auto;padding:24px;position:relative}
+  .modal-box .x{position:absolute;top:16px;right:18px;font-size:22px;color:var(--ink2);cursor:pointer}
+
+  /* lightbox */
+  .lb{position:fixed;inset:0;z-index:80;background:rgba(18,18,20,.92);display:none;padding:26px}
+  .lb.open{display:flex;align-items:center;justify-content:center}
+  .lb .close{position:absolute;top:16px;right:22px;color:rgba(255,255,255,.85);font-size:26px;cursor:pointer;z-index:2}
+  .lb .stage{width:100%;max-width:1100px;height:82vh;border:1px dashed rgba(255,255,255,.35);border-radius:10px;
+      display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);
+      background:linear-gradient(45deg,transparent 46%,rgba(255,255,255,.08) 46%,rgba(255,255,255,.08) 54%,transparent 54%);
+      background-size:22px 22px}
+  .lb .nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;
+      background:rgba(255,255,255,.16);color:#fff;border:none;font-size:22px;cursor:pointer}
+  .lb .nav.prev{left:12px} .lb .nav.next{right:12px}
+  .lb .count{position:absolute;bottom:12px;left:0;right:0;text-align:center;color:rgba(255,255,255,.7);font-size:12px}
+  .likebtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line2);border-radius:20px;
+      padding:6px 14px;cursor:pointer;background:var(--surface);font-size:13px}
+  .likebtn.liked{color:#c0453c;border-color:#e6b6b2;background:#fbeceb}
+  .clist{flex:1;overflow:auto;padding:12px 0;display:flex;flex-direction:column;gap:12px}
+  .citem{font-size:13px} .citem .top{display:flex;justify-content:space-between;align-items:center}
+  .citem .nm{font-weight:600} .citem .acts{display:flex;gap:8px;font-size:11px;color:var(--ink3)}
+  .citem .acts span{cursor:pointer} .citem .acts .del{color:var(--danger)}
+  .cform{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:8px}
+  .cform .row{display:flex;gap:8px} .cform .row .field{flex:1}
+
+  @media(max-width:780px){
+    .gwrap{gap:10px} .gcard .ph{height:180px} .addtile{min-height:180px}
+    .rel{grid-template-columns:repeat(3,1fr)}
+    .dhero{grid-template-columns:1fr} .prod{grid-template-columns:1fr}
+    .prod .imgside .ph{min-height:220px}
+    nav{gap:0}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="logo" data-go="home">TOM IN THE WATER</a>
+    <nav>
+      <div class="navitem"><a data-go="about">About</a></div>
+      <div class="navitem">
+        <a data-go="gallery">Gallery</a>
+        <div class="drop">
+          <a data-go="gallery" data-cat="in">In the Water<small>수중 작업</small></a>
+          <a data-go="gallery" data-cat="on">On the Water<small>지상 작업</small></a>
+        </div>
+      </div>
+      <div class="navitem">
+        <a data-go="products">Course</a>
+        <div class="drop">
+          <a data-go="products" data-group="essential">Essential<small>기본 촬영 · Basic · Premium</small></a>
+          <a data-go="products" data-group="special">Special<small>특별 촬영 · Blue Lagoon · Moonshore</small></a>
+          <a data-go="products" data-group="group">Group &amp; Commercial<small>그룹 · 이벤트 · 상업</small></a>
+        </div>
+      </div>
+      <div class="navitem"><a data-go="reviews">Reviews</a></div>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- HOME -->
+  <section class="page active" id="home">
+    <div class="ph hero">
+      <div class="inner">
+        <h1>A journey underwater to meet another Me.</h1>
+        <div class="muted">서브 카피 · 한 줄 브랜드 문장</div>
+        <div class="dim" style="margin-top:20px">↓ 스크롤</div>
+      </div>
+    </div>
+    <div class="sec" style="border-bottom:none">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px">
+        <div class="tag" style="margin:0">FEATURED WORK</div>
+        <span class="dim admin-only" style="font-size:11px">관리자 모드 · 사진을 빼거나(−) 추가(＋)</span>
+      </div>
+      <div class="gwrap" id="homeGrid"></div>
+      <div class="center" style="margin-top:22px"><a class="btn" data-go="gallery">갤러리 전체 보기 →</a></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="page" id="about">
+    <div class="sec">
+      <div class="tag">ABOUT</div>
+      <div class="dhero">
+        <div class="imgcol"><div class="ph">작가 이미지</div></div>
+        <div>
+          <h2 style="font-size:22px;margin-bottom:10px">작가 TOM</h2>
+          <p class="muted">물이라는 다른 차원에서 만나는 또 다른 나. 그 여정을 기록합니다.</p>
+          <p class="muted" style="margin-top:16px"><b>경력</b> · 주요 클라이언트 · 수상 · 장비 · 촬영 가능 범위를 정리해 신뢰를 쌓습니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="page" id="gallery">
+    <div class="sec">
+      <h2 style="font-size:22px;text-align:center;margin-bottom:16px">Gallery</h2>
+      <div class="center" style="margin-bottom:24px">
+        <div class="seg">
+          <button class="on" data-seg>In the Water · 수중</button>
+          <button data-seg>On the Water · 지상</button>
+        </div>
+      </div>
+      <div class="frow" style="justify-content:center">
+        <span class="chip on" data-f>전체</span><span class="chip" data-f>event</span>
+        <span class="chip" data-f>commercial</span><span class="chip" data-f>장소</span><span class="chip" data-f>연도</span>
+      </div>
+      <div class="center admin-only" style="justify-content:flex-end;margin:6px 0 12px">
+        <span class="admin-tag" style="display:inline-flex">＋ 새 프로젝트</span>
+      </div>
+      <div class="masonry" id="galleryGrid"></div>
+      <div class="dim center" style="font-size:11px;margin-top:14px">가로·세로 혼합 · 원본 비율 유지 Masonry (2열)</div>
+    </div>
+  </section>
+
+  <!-- PROJECT DETAIL -->
+  <section class="page" id="detail">
+    <div class="sec">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <div class="muted" style="font-size:13px"><a data-go="gallery">Gallery</a> › In the Water(수중) › 프로젝트</div>
+        <div style="display:flex;gap:8px">
+          <span class="admin-tag admin-only" style="padding:6px 10px">✎ 수정</span>
+          <span class="admin-tag admin-del admin-only" style="padding:6px 10px">✕</span>
+        </div>
+      </div>
+
+      <div class="dhero">
+        <div class="imgcol"><div class="ph">대표 이미지 (원본 비율 · 자르지 않음)</div></div>
+        <div>
+          <h2 style="font-size:24px">프로젝트 제목</h2>
+          <div class="muted" style="margin-top:6px">In the Water · 📅 2026.03 촬영</div>
+          <p class="muted" style="font-style:italic;margin-top:16px">"서정적 캡션 한 줄 — 프로젝트 콘셉트."</p>
+          <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px" class="muted">
+            <span>📍 장소</span><span>👥 협업자</span><span>📷 장비</span>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:8px"><span class="chip">event</span></div>
+        </div>
+      </div>
+
+      <div class="tag" style="margin:34px 0 12px">프로젝트 이미지 · 가로/세로 혼합 Masonry (클릭 → 전체화면)</div>
+      <div class="masonry" id="tiles"></div>
+
+      <div style="display:flex;justify-content:space-between;margin-top:30px">
+        <span class="btn">← 이전 프로젝트</span><span class="btn">다음 프로젝트 →</span>
+      </div>
+
+      <div class="card" style="padding:20px;margin-top:34px">
+        <div class="tag" style="margin:0 0 12px">이 프로젝트 · 좋아요 &amp; 댓글 (프로젝트 단위)</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <span class="likebtn" id="pjLikeBtn" onclick="pjLike()">♥ <span id="pjLikeCount">0</span></span>
+          <span class="dim" style="font-size:12px">이 프로젝트가 좋았다면 자유롭게 좋아요</span>
+        </div>
+        <div id="pjClist" style="display:flex;flex-direction:column;gap:12px;margin-bottom:14px"></div>
+        <div style="border-top:1px solid var(--line);padding-top:14px">
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <input class="field" id="pjNick" placeholder="닉네임">
+            <input class="field" id="pjPwd" type="password" placeholder="비밀번호 (수정/삭제 시 필요)">
+          </div>
+          <textarea class="field" id="pjBody" rows="2" placeholder="이 프로젝트에 댓글 남기기…" style="margin-bottom:8px"></textarea>
+          <div style="display:flex;justify-content:flex-end"><span class="btn" onclick="pjAdd()">등록</span></div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:baseline;gap:10px;margin:34px 0 12px">
+        <div class="tag" style="margin:0">YOU MAY ALSO LIKE</div>
+        <span class="dim" style="font-size:11px">같은 카테고리 · 공유 태그 기준 자동 추천</span>
+      </div>
+      <div class="rel" id="relatedGrid"></div>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="page" id="products">
+    <div class="sec">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div><h2 style="font-size:22px">Course</h2>
+        <div class="muted" style="margin-top:2px">촬영 코스 안내</div></div>
+        <span class="admin-tag admin-only">＋ 새 상품</span>
+      </div>
+
+      <div class="center" style="margin-bottom:26px">
+        <div class="seg" id="groupSeg">
+          <button data-group="essential">Essential · 기본</button>
+          <button data-group="special">Special · 특별</button>
+          <button data-group="group">Group &amp; Commercial</button>
+        </div>
+      </div>
+
+      <div id="productList"></div>
+      <div id="crossBlock"></div>
+
+      <div class="card" style="padding:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:8px">
+        <div><b>화보 촬영 시 드레스·머메이드테일 등 대여 가능</b>
+          <div class="muted" style="font-size:13px;margin-top:2px">대여 가능한 의상을 유형·사이즈·컬러·가능 코스로 확인해 보세요.</div></div>
+        <a class="btn" data-go="costumes">의상 대여 목록 보기 →</a>
+      </div>
+
+      <div class="inquiry" style="margin-top:24px">
+        <h3 style="font-size:18px">촬영 문의는 아래로 주세요</h3>
+        <div class="muted" style="margin-top:4px">상품·일정·견적 편하게 상담해 드립니다</div>
+        <div style="margin-top:16px"><span class="btn kbtn" style="padding:11px 26px" onclick="openKakao()">문의하기</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COSTUMES -->
+  <section class="page" id="costumes">
+    <div class="sec">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div><h2 style="font-size:22px">의상 대여</h2>
+        <div class="muted" style="margin-top:2px">촬영용 의상 유료 대여 목록</div></div>
+        <span class="admin-tag admin-only">＋ 새 의상</span>
+      </div>
+
+      <div class="card" style="padding:16px;margin:18px 0 22px">
+        <div class="frow"><span class="flabel">유형</span>
+          <span class="chip on" data-f>전체</span><span class="chip" data-f>수영복</span><span class="chip" data-f>슈트</span>
+          <span class="chip" data-f>드레스</span><span class="chip" data-f>치마</span><span class="chip" data-f>머메이드 테일</span>
+          <span class="chip" data-f>컨셉 의상</span><span class="chip" data-f>소품</span></div>
+        <div class="frow"><span class="flabel">사이즈</span>
+          <span class="chip" data-f>44</span><span class="chip" data-f>55</span><span class="chip" data-f>66</span>
+          <span class="chip" data-f>77</span><span class="chip" data-f>Free</span></div>
+        <div class="frow"><span class="flabel">컬러</span>
+          <span class="dot" style="background:#fff"></span><span class="dot" style="background:#3b82c4"></span>
+          <span class="dot" style="background:#c44e7a"></span><span class="dot" style="background:#2f2f2f"></span><span class="dim">…</span></div>
+        <div class="frow" style="margin-bottom:0"><span class="flabel">촬영 종류</span>
+          <span class="chip on" data-f>전체</span><span class="chip" data-f>Essential</span><span class="chip" data-f>Special</span>
+          <span class="chip" data-f>Group</span></div>
+      </div>
+
+      <div class="gwrap" id="costumeGrid" style="grid-template-columns:repeat(3,1fr)"></div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="page" id="reviews">
+    <div class="sec">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <div><h2 style="font-size:22px">Reviews</h2>
+        <div class="muted" style="margin-top:2px">누구나 자유롭게 작성 · 부적절한 글은 관리자가 삭제</div></div>
+        <span class="btn" onclick="openReviewModal()">✎ 후기 작성하기</span>
+      </div>
+      <div class="frow" style="margin-bottom:16px"><span class="flabel">촬영 상품</span>
+        <span class="chip on" data-rf>전체</span><span class="chip" data-rf>BASIC</span><span class="chip" data-rf>PREMIUM</span>
+        <span class="chip" data-rf>BLUE LAGOON</span><span class="chip" data-rf>MOONSHORE</span><span class="chip" data-rf>GROUP</span></div>
+      <div class="tag">후기 목록 (최신순)</div>
+      <div style="display:flex;flex-direction:column;gap:14px" id="reviewList"></div>
+      <div class="center" style="margin-top:20px"><span class="btn" onclick="loadMoreReviews()">더 보기</span></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div style="font-weight:600;letter-spacing:.08em">TOM IN THE WATER</div>
+      <div class="muted" style="font-size:13px;margin-top:4px">수중 사진작가</div>
+      <div style="display:flex;gap:16px;margin-top:14px">
+        <span class="ficon" title="Instagram" onclick="alert('Instagram @tom_freedive (목업)')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </span>
+        <span class="ficon" title="카카오톡 채널" onclick="openKakao()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4C7 4 3 7.1 3 11c0 2.5 1.7 4.7 4.2 5.9L6.5 20l3.6-2.2c.6.1 1.2.2 1.9.2 5 0 9-3.1 9-7s-4-7-9-7z"/></svg>
+        </span>
+      </div>
+    </div>
+    <nav class="sitemap">
+      <div class="scol"><span class="sh">Gallery</span><a data-go="gallery">In the Water</a><a data-go="gallery">On the Water</a></div>
+      <div class="scol"><span class="sh">Course</span><a data-go="products">Essential</a><a data-go="products">Special</a><a data-go="products">Group / Commercial</a></div>
+      <div class="scol"><span class="sh">More</span><a data-go="about">About</a><a data-go="reviews">촬영 후기</a><a data-go="costumes">의상 대여</a></div>
+    </nav>
+  </div>
+</footer>
+
+<div class="fabs">
+  <div class="fab k" title="카카오톡 문의" onclick="openKakao()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4C7 4 3 7.1 3 11c0 2.5 1.7 4.7 4.2 5.9L6.5 20l3.6-2.2c.6.1 1.2.2 1.9.2 5 0 9-3.1 9-7s-4-7-9-7z"/></svg>
+  </div>
+  <div class="fab" title="맨 위로" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+</div>
+
+<div class="adminswitch" id="adminLoginBtn" onclick="openModal('loginModal')">🔒 관리자</div>
+<div class="adminbar" id="adminBar">
+  <span class="adot"></span> 관리자 · TOM
+  <span class="abar-r"><span>편집 모드 ON</span><span class="alogout" onclick="doLogout()">로그아웃</span></span>
+</div>
+
+<!-- admin login modal (/admin) -->
+<div class="modal" id="loginModal">
+  <div class="modal-box" style="max-width:380px">
+    <span class="x" onclick="closeModal('loginModal')">✕</span>
+    <div class="center" style="margin-bottom:18px">
+      <div style="font-weight:600;letter-spacing:.1em">TOM IN THE WATER</div>
+      <div class="dim" style="font-size:12px;margin-top:4px">관리자 로그인 · /admin</div>
+    </div>
+    <span class="lbl">이메일</span><input class="field" style="margin-bottom:10px" placeholder="owner@tominthewater.com">
+    <span class="lbl">비밀번호</span><input class="field" type="password" style="margin-bottom:16px" placeholder="••••••••">
+    <button class="pbtn" style="width:100%" onclick="doLogin()">로그인</button>
+    <div class="center" style="margin-top:12px"><a class="dim" style="font-size:12px;text-decoration:underline" onclick="closeModal('loginModal');openModal('forgotModal')">비밀번호를 잊으셨나요?</a></div>
+    <div class="dim" style="font-size:11px;text-align:center;margin-top:12px">Supabase Auth · 1인 소유자 계정<br>(데모: 그냥 로그인 버튼을 누르면 편집 모드로 전환됩니다)</div>
+  </div>
+</div>
+
+<!-- forgot password: request reset link -->
+<div class="modal" id="forgotModal">
+  <div class="modal-box" style="max-width:380px">
+    <span class="x" onclick="closeModal('forgotModal')">✕</span>
+    <h3 style="font-size:17px;margin-bottom:6px">비밀번호 재설정</h3>
+    <div class="muted" style="font-size:13px;margin-bottom:16px">가입한 이메일로 재설정 링크를 보내드립니다.</div>
+    <span class="lbl">이메일</span><input class="field" style="margin-bottom:16px" placeholder="owner@tominthewater.com">
+    <button class="pbtn" style="width:100%" onclick="closeModal('forgotModal');alert('재설정 링크를 이메일로 보냈습니다 (목업).\n데모: 이메일 링크를 열면 아래 재설정 화면이 뜹니다.');openModal('resetModal')">재설정 링크 보내기</button>
+    <div class="dim" style="font-size:11px;text-align:center;margin-top:12px">supabase.auth.resetPasswordForEmail(email)</div>
+  </div>
+</div>
+
+<!-- reset password: after clicking email link (/admin/reset) -->
+<div class="modal" id="resetModal">
+  <div class="modal-box" style="max-width:380px">
+    <span class="x" onclick="closeModal('resetModal')">✕</span>
+    <h3 style="font-size:17px;margin-bottom:6px">새 비밀번호 설정</h3>
+    <div class="muted" style="font-size:13px;margin-bottom:16px">이메일 링크로 접속한 화면 · /admin/reset</div>
+    <span class="lbl">새 비밀번호</span><input class="field" type="password" style="margin-bottom:10px" placeholder="••••••••">
+    <span class="lbl">새 비밀번호 확인</span><input class="field" type="password" style="margin-bottom:16px" placeholder="••••••••">
+    <button class="pbtn" style="width:100%" onclick="closeModal('resetModal');alert('비밀번호가 변경되었습니다 (목업)')">비밀번호 변경</button>
+    <div class="dim" style="font-size:11px;text-align:center;margin-top:12px">supabase.auth.updateUser({ password })</div>
+  </div>
+</div>
+
+<!-- project add/edit modal -->
+<div class="modal" id="editProjectModal">
+  <div class="modal-box">
+    <span class="x" onclick="closeModal('editProjectModal')">✕</span>
+    <h3 style="font-size:18px;margin-bottom:16px" id="epTitle">프로젝트 수정</h3>
+    <div class="row2">
+      <div><span class="lbl">제목</span><input class="field" value="프로젝트 제목"></div>
+      <div><span class="lbl">촬영 일시</span><input class="field" value="2026.03"></div>
+    </div>
+    <div class="row2" style="margin-top:2px">
+      <div><span class="lbl">카테고리</span><div style="display:flex;gap:6px"><span class="chip on" data-f>수중</span><span class="chip" data-f>지상</span></div></div>
+      <div><span class="lbl">공개 여부</span><div style="display:flex;gap:6px"><span class="chip on" data-f>공개</span><span class="chip" data-f>비공개</span></div></div>
+    </div>
+    <span class="lbl" style="margin-top:12px">캡션</span><input class="field" value="서정적 한 줄…">
+    <div class="row2" style="margin-top:2px">
+      <div><span class="lbl">장소</span><input class="field" placeholder="장소"></div>
+      <div><span class="lbl">협업자</span><input class="field" placeholder="협업자"></div>
+    </div>
+    <span class="lbl" style="margin-top:12px">장비 · 태그</span>
+    <div style="display:flex;gap:6px;margin-bottom:12px"><span class="chip">event ✕</span><span class="chip">＋ 태그</span></div>
+    <span class="lbl">이미지 (대표 + 갤러리 · 드래그로 순서)</span>
+    <div class="upload">
+      <div class="ph">대표</div><div class="ph">↕</div><div class="ph">↕</div>
+      <div class="ph" style="border-style:dashed;color:var(--admin)">＋ 업로드</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span class="dim" style="font-size:11px">Storage 업로드 · alt 입력</span>
+      <span><span class="btn" onclick="closeModal('editProjectModal')">취소</span> <button class="pbtn" onclick="closeModal('editProjectModal')">저장</button></span>
+    </div>
+  </div>
+</div>
+
+<!-- costume add/edit modal -->
+<div class="modal" id="editCostumeModal">
+  <div class="modal-box">
+    <span class="x" onclick="closeModal('editCostumeModal')">✕</span>
+    <h3 style="font-size:18px;margin-bottom:16px">의상 수정</h3>
+    <div class="row2">
+      <div><span class="lbl">의상 이름</span><input class="field" placeholder="의상 이름"></div>
+      <div><span class="lbl">대여가</span><div style="display:flex;gap:6px"><span class="chip" data-f>1만</span><span class="chip on" data-f>3만</span><span class="chip" data-f>5만</span></div></div>
+    </div>
+    <span class="lbl" style="margin-top:12px">유형</span>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"><span class="chip" data-f>수영복</span><span class="chip" data-f>슈트</span><span class="chip on" data-f>드레스</span><span class="chip" data-f>치마</span><span class="chip" data-f>머메이드 테일</span><span class="chip" data-f>컨셉 의상</span><span class="chip" data-f>소품</span></div>
+    <div class="row2">
+      <div><span class="lbl">사이즈 (복수)</span><div style="display:flex;gap:6px"><span class="chip">44</span><span class="chip on">55</span><span class="chip on">66</span><span class="chip">77</span><span class="chip">Free</span></div></div>
+      <div><span class="lbl">컬러 (복수)</span><div style="display:flex;gap:6px;align-items:center"><span class="dot" style="background:#fff"></span><span class="dot" style="background:#3b82c4"></span><span class="dim">＋</span></div></div>
+    </div>
+    <span class="lbl" style="margin-top:12px">가능 코스 (난이도 · 복수)</span>
+    <div style="display:flex;gap:6px;margin-bottom:12px"><span class="chip">Essential</span><span class="chip on">Premium+</span><span class="chip">Special</span></div>
+    <span class="lbl">이미지</span>
+    <div class="upload"><div class="ph">대표</div><div class="ph">↕</div><div class="ph" style="border-style:dashed;color:var(--admin)">＋</div><div class="ph" style="visibility:hidden"></div></div>
+    <div style="text-align:right"><span class="btn" onclick="closeModal('editCostumeModal')">취소</span> <button class="pbtn" onclick="closeModal('editCostumeModal')">저장</button></div>
+  </div>
+</div>
+
+<!-- delete confirm -->
+<div class="modal" id="confirmModal">
+  <div class="modal-box" style="max-width:400px">
+    <h3 style="font-size:17px;margin-bottom:8px" id="confTitle">삭제할까요?</h3>
+    <div class="muted" id="confBody" style="margin-bottom:18px">영구 삭제되며 되돌릴 수 없습니다.</div>
+    <div style="text-align:right"><span class="btn" onclick="closeModal('confirmModal')">취소</span> <button class="dbtn" onclick="closeModal('confirmModal')">삭제</button></div>
+  </div>
+</div>
+
+<!-- project picker modal (featured add) -->
+<div class="modal" id="pickModal">
+  <div class="modal-box">
+    <span class="x" onclick="closeModal('pickModal')">✕</span>
+    <h3 style="font-size:18px;margin-bottom:4px">Featured에 추가할 프로젝트 선택</h3>
+    <div class="muted" style="font-size:13px;margin-bottom:16px">등록된 프로젝트 중에서 골라 홈 대표작에 추가합니다.</div>
+    <div class="frow"><span class="flabel">분류</span>
+      <span class="chip on" data-f>전체</span><span class="chip" data-f>수중</span><span class="chip" data-f>지상</span></div>
+    <div class="frow"><span class="flabel">연도</span>
+      <span class="chip on" data-f>전체</span><span class="chip" data-f>2026</span><span class="chip" data-f>2025</span><span class="chip" data-f>2024</span></div>
+    <div class="gwrap" id="pickGrid" style="grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- review write modal -->
+<div class="modal" id="reviewModal">
+  <div class="modal-box">
+    <span class="x" onclick="closeModal('reviewModal')">✕</span>
+    <h3 style="font-size:18px;margin-bottom:16px">촬영 후기 작성</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div><span class="lbl">이름/닉네임</span><input class="field" placeholder="닉네임"></div>
+      <div><span class="lbl">촬영 상품</span>
+        <select class="field" id="revProduct">
+          <option>BASIC COURSE</option><option>PREMIUM COURSE</option>
+          <option>BLUE LAGOON HALL</option><option>SIGNATURE (MOONSHORE)</option>
+          <option>GROUP / EVENT / COMMERCIAL</option>
+        </select></div>
+    </div>
+    <span class="lbl">별점 <span class="dim" id="rateVal" style="font-size:11px">— 별을 눌러 선택</span></span>
+    <div class="rate" id="rateInput" style="margin-bottom:12px">
+      <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+    </div>
+    <span class="lbl">후기 내용</span>
+    <textarea class="field" rows="7" style="margin-bottom:12px" placeholder="촬영은 어땠나요…"></textarea>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;gap:12px;align-items:center">
+        <span class="btn" style="padding:6px 12px">🖼 사진 첨부(선택)</span><span class="dim" style="font-size:12px">🛡 스팸방지 캡차</span></div>
+      <span class="btn" style="border-color:var(--admin);color:var(--admin)" onclick="closeModal('reviewModal')">등록</span>
+    </div>
+  </div>
+</div>
+
+<!-- lightbox — 감상 전용 (좋아요/댓글 없음) -->
+<div class="lb" id="lb">
+  <span class="close" onclick="closeLb()">✕</span>
+  <button class="nav prev" onclick="stepLb(-1)">‹</button>
+  <div class="stage">화면 꽉 채운 사진 · 온전히 감상</div>
+  <button class="nav next" onclick="stepLb(1)">›</button>
+  <div class="count" id="lbCount"></div>
+</div>
+
+<script>
+  function openKakao(){alert('카카오톡 채널로 이동 (목업)');}
+  function openModal(id){document.getElementById(id).classList.add('open');}
+  function closeModal(id){document.getElementById(id).classList.remove('open');}
+  document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+  function go(id){
+    document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));
+    document.querySelectorAll('.navitem>a').forEach(a=>a.classList.toggle('active',a.dataset.go===id));
+    window.scrollTo(0,0);
+  }
+  document.addEventListener('click',e=>{
+    const t=e.target.closest('[data-go]'); if(!t)return; e.preventDefault();
+    go(t.dataset.go);
+    if(t.dataset.group){showGroup(t.dataset.group);}
+    else if(t.dataset.go==='products'){showGroup('essential');}
+    if(t.dataset.scroll){const el=document.getElementById(t.dataset.scroll); if(el)setTimeout(()=>el.scrollIntoView({behavior:'smooth'}),60);}
+    if(t.dataset.cat){
+      const segs=document.querySelectorAll('#gallery [data-seg]');
+      segs.forEach((s,i)=>s.classList.toggle('on', (t.dataset.cat==='on')?i===1:i===0));
+    }
+  });
+  document.addEventListener('click',e=>{
+    const c=e.target.closest('.chip[data-f]');
+    if(c){c.parentElement.querySelectorAll('.chip[data-f]').forEach(x=>x.classList.remove('on'));c.classList.add('on');}
+    const s=e.target.closest('[data-seg]');
+    if(s && !s.dataset.group){s.parentElement.querySelectorAll('[data-seg]').forEach(x=>x.classList.remove('on'));s.classList.add('on');}
+  });
+
+  const ph=(label)=>`<div class="ph">${label||'IMAGE'}</div>`;
+  const gcardHTML=(name,removable)=>
+    `<div class="gcard">${ph('IMAGE')}<div class="ov"><div><b>${name}</b><br><span>연도</span></div></div>`+
+    (removable?`<button class="fremove" title="Featured에서 제외" onclick="event.stopPropagation();this.parentElement.remove()">−</button>`:``)+`</div>`;
+
+  // FEATURED (admin add/remove)
+  let featured=['프로젝트 1','프로젝트 2','프로젝트 3','프로젝트 4'];
+  function renderFeatured(){
+    const el=document.getElementById('homeGrid');
+    el.innerHTML=featured.map(n=>gcardHTML(n,true)).join('')
+      +`<div class="addtile" onclick="openModal('pickModal')"><span class="plus">＋</span>Featured 사진 추가</div>`;
+    el.querySelectorAll('.gcard').forEach(c=>c.addEventListener('click',ev=>{if(!ev.target.closest('.fremove'))go('detail');}));
+  }
+  renderFeatured();
+
+  // project picker grid
+  (function(){const el=document.getElementById('pickGrid');
+    for(let i=0;i<9;i++){const d=document.createElement('div');d.className='gcard';d.style.cursor='pointer';
+      d.innerHTML=ph('IMAGE')+`<div class="ov" style="opacity:1;background:rgba(0,0,0,.35)"><div><b style="font-size:12px">프로젝트 ${i+1}</b></div></div>`;
+      d.onclick=()=>{featured.push('프로젝트 '+(i+1));renderFeatured();closeModal('pickModal');};
+      el.appendChild(d);}})();
+
+  // gallery masonry (mixed portrait/landscape, 원본 비율 유지)
+  const galAspects=['3 / 4','4 / 3','2 / 3','16 / 10','4 / 5','1 / 1','3 / 4','3 / 2'];
+  (function(){const el=document.getElementById('galleryGrid');
+    el.innerHTML=galAspects.map(ar=>
+      `<div class="gcard"><div class="ph" style="aspect-ratio:${ar}">${ar.replace(/ /g,'')}</div>`+
+      `<div class="ov"><div><b>프로젝트 제목</b><br><span>연도</span></div></div></div>`).join('');
+    el.querySelectorAll('.gcard').forEach(t=>t.addEventListener('click',()=>go('detail')));})();
+
+  // related (3열 균일 유지)
+  function fillG(el,n,name){el.innerHTML='';for(let i=0;i<n;i++)el.insertAdjacentHTML('beforeend',gcardHTML(name||('프로젝트 '+(i+1)),false));
+    el.querySelectorAll('.gcard').forEach(t=>t.addEventListener('click',()=>go('detail')));}
+  fillG(document.getElementById('relatedGrid'),3,'관련 프로젝트');
+
+  // detail tiles masonry (mixed orientation)
+  (function(){const el=document.getElementById('tiles');
+    const ars=['4 / 3','3 / 4','3 / 4','4 / 3','2 / 3','16 / 10'];
+    el.innerHTML=ars.map((ar,i)=>`<div class="ph" style="aspect-ratio:${ar};cursor:zoom-in" onclick="openLb(${i},${ars.length})">${ar.replace(/ /g,'')}</div>`).join('');})();
+
+  // PRODUCTS with groups
+  const products=[
+    {no:1,group:'essential',title:'BASIC COURSE',sub:'깔끔하고 직관적인 수중 프로필',
+      feat:['수영복 / 슈트 / 머메이드테일','1인 / 2인 커플 또는 우정 촬영','의상 개인 준비 (슈트·테일 대여 가능, 유료)'],
+      price:'25만 원',notes:['헬퍼 옵션 추가 시 +5만 원','포프라자 / 딥스테이션 / MS다이빙풀 중 택일']},
+    {no:2,group:'essential',title:'PREMIUM COURSE',sub:'환상적인 드레스, 고난도의 연출',
+      feat:['드레스 / 셔츠 / 코스프레','1인 / 2인 커플 또는 우정 촬영','의상 개인 준비 (의상 대여 가능, 유료)','안전하고 완벽한 촬영을 위한 헬퍼'],
+      price:'35만 원',notes:['헬퍼 기본 포함','포프라자 / 딥스테이션 / MS다이빙풀 중 택일']},
+    {no:3,group:'special',title:'BLUE LAGOON HALL',sub:'여름 한정! 웨이브파크 블루라군홀 촬영',
+      feat:['아름답고 개방감 넘치는 야외 수중 환경','2인 / 3인 전용','의상 개인 준비 (수영복, 슈트, 머메이드)','의상 대여 가능 (유료)'],
+      price:'2인 1인 15만 원 / 3인 1인 10만 원',notes:[]},
+    {no:4,group:'special',title:'SIGNATURE CONCEPT with MOONSHORE',sub:'아름다운 테마의 주인공이 되는 시간 (준비 중)',
+      feat:['언더워터웨어 브랜드 MOONSHORE 와의 협업','테마별 전용 의상, 소품 및 세팅 제공'],
+      price:'COMING SOON',notes:[],coming:true},
+    {no:5,group:'group',title:'GROUP / EVENT & COMMERCIAL',sub:'단체·행사·상업 촬영',
+      feat:['단체(3인 이상) / 행사 / 상업 촬영','@tom_freedive 계정으로 별도 문의'],
+      price:'별도 문의',notes:[]},
+  ];
+  const groupMeta={essential:{ko:'기본 촬영',cross:'special'},special:{ko:'특별 촬영',cross:'essential'},group:{ko:'그룹 · 이벤트 · 상업',cross:null}};
+  function productHTML(p){
+    return `<div class="prod${p.coming?' coming':''}" id="prod${p.no}">
+        <div class="imgside">${ph('IMAGE')}</div>
+        <div class="body">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div class="ptitle">${p.title}</div>
+            <span style="display:flex;gap:6px">
+              <span class="admin-tag admin-only" style="padding:4px 8px">✎</span>
+              <span class="admin-tag admin-del admin-only" style="padding:4px 8px">✕</span></span>
+          </div>
+          <div class="psub">${p.sub}</div>
+          <ul class="pfeat">${p.feat.map(f=>`<li>${f}</li>`).join('')}</ul>
+          <div class="price">${p.coming?'COMING SOON':('💰 '+p.price)}</div>
+          ${p.notes.map(n=>`<div class="pnote">※ ${n}</div>`).join('')}
+        </div></div>`;
+  }
+  function showGroup(g){
+    document.querySelectorAll('#groupSeg [data-group]').forEach(b=>b.classList.toggle('on',b.dataset.group===g));
+    document.getElementById('productList').innerHTML=products.filter(p=>p.group===g).map(productHTML).join('');
+    const cross=groupMeta[g].cross, cb=document.getElementById('crossBlock');
+    if(cross){
+      const label=groupMeta[cross].ko;
+      cb.innerHTML=`<div class="tag" style="margin:26px 0 12px">이런 촬영은 어떠세요? · ${label}</div>
+        <div style="display:flex;flex-direction:column;gap:10px">`+
+        products.filter(p=>p.group===cross).map(p=>
+          `<div class="crosscard" onclick="showGroup('${cross}');window.scrollTo({top:0,behavior:'smooth'})">
+            ${ph('IMAGE')}<div><b>${p.title}</b><div class="muted" style="font-size:12px">${p.sub}</div></div></div>`).join('')
+        +`</div>`;
+    } else cb.innerHTML='';
+  }
+  document.querySelectorAll('#groupSeg [data-group]').forEach(b=>b.addEventListener('click',()=>showGroup(b.dataset.group)));
+  showGroup('essential');
+
+  // costumes
+  (function(){const el=document.getElementById('costumeGrid');
+    const data=[
+      ['드레스','55','3만원',['#fff','#3b82c4'],'Premium+'],
+      ['머메이드 테일','Free','5만원',['#c44e7a'],'Essential+'],
+      ['드레스','66','2만원',['#2f2f2f','#fff'],'Premium+'],
+      ['슈트','44','1만원',['#3b82c4'],'Essential+'],
+      ['소품','Free','1만원',['#fff'],'전체'],
+      ['컨셉 의상','77','4만원',['#c44e7a','#2f2f2f'],'Premium+'],
+    ];
+    data.forEach(([type,size,price,colors,course])=>{
+      const dots=colors.map(c=>`<span class="dot" style="background:${c}"></span>`).join(' ');
+      const d=document.createElement('div');d.className='card ccard';
+      d.innerHTML=`${ph('IMAGE')}
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <b style="font-size:13px">의상 이름</b>
+          <span style="display:flex;gap:5px">
+            <span class="admin-tag admin-only" style="padding:3px 7px">✎</span>
+            <span class="admin-tag admin-del admin-only" style="padding:3px 7px">✕</span></span></div>
+        <div class="muted" style="margin-top:3px;font-size:13px">${type} · ${size} · ${price}</div>
+        <div style="margin:8px 0;display:flex;align-items:center;gap:8px">${dots}
+          <span class="courseChip">${course}</span></div>`;
+      el.appendChild(d);
+    });})();
+
+  // reviews (촬영 상품 선택 + 필터)
+  let reviewsData=[
+    {rating:5,body:'후기 본문 텍스트가 여기에 들어갑니다. 방문자가 직접 작성.',who:'작성자',date:'2026.07.01',product:'PREMIUM'},
+    {rating:4,body:'사진 없이 텍스트만 있을 수도 있음.',who:'작성자',date:'2026.06.28',product:'BASIC'},
+    {rating:5,body:'블루라군홀 촬영 너무 좋았어요.',who:'작성자',date:'2026.06.20',product:'BLUE LAGOON'},
+  ];
+  let reviewFilter='전체';
+  function starStr(n){return '★'.repeat(n)+'☆'.repeat(5-n);}
+  function reviewHTML(r,i){
+    return `<div class="card" style="padding:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="display:flex;align-items:center;gap:10px"><span class="stars">${starStr(r.rating)}</span><span class="rbadge">${r.product}</span></span>
+        <span class="admin-tag admin-del admin-only" style="padding:4px 9px">✕</span></div>
+      <div class="muted" style="margin-top:6px">${r.body}</div>
+      <div class="dim" style="font-size:11px;margin-top:8px">— ${r.who} · ${r.date}</div></div>`;
+  }
+  function renderReviews(){
+    const el=document.getElementById('reviewList');
+    const list=reviewsData.filter(r=>reviewFilter==='전체'||r.product===reviewFilter);
+    el.innerHTML=list.length?list.map(reviewHTML).join('')
+      :'<div class="dim" style="font-size:13px">해당 상품의 후기가 아직 없습니다.</div>';
+  }
+  function loadMoreReviews(){
+    reviewsData=reviewsData.concat(reviewsData.slice(0,3).map(r=>({...r})));
+    renderReviews();
+  }
+  renderReviews();
+  // review product filter
+  document.addEventListener('click',e=>{
+    const c=e.target.closest('.chip[data-rf]'); if(!c)return;
+    c.parentElement.querySelectorAll('.chip[data-rf]').forEach(x=>x.classList.remove('on'));
+    c.classList.add('on'); reviewFilter=c.textContent.trim(); renderReviews();
+  });
+  // interactive star rating input
+  let curRate=0;
+  (function(){
+    const ri=document.getElementById('rateInput'); if(!ri)return;
+    const spans=[...ri.querySelectorAll('span')];
+    const paint=n=>spans.forEach((s,i)=>s.classList.toggle('on',i<n));
+    spans.forEach(s=>{
+      s.addEventListener('mouseenter',()=>paint(+s.dataset.v));
+      s.addEventListener('click',()=>{curRate=+s.dataset.v;paint(curRate);document.getElementById('rateVal').textContent=curRate+' / 5';});
+    });
+    ri.addEventListener('mouseleave',()=>paint(curRate));
+  })();
+  function openReviewModal(){
+    curRate=0;
+    document.querySelectorAll('#rateInput span').forEach(s=>s.classList.remove('on'));
+    document.getElementById('rateVal').textContent='— 별을 눌러 선택';
+    openModal('reviewModal');
+  }
+
+  // admin auth (mock)
+  function doLogin(){document.body.classList.add('admin');closeModal('loginModal');renderPj();}
+  function doLogout(){document.body.classList.remove('admin');renderPj();}
+  // inline edit/delete routing
+  function openConfirm(title,body){
+    document.getElementById('confTitle').textContent=title||'삭제할까요?';
+    document.getElementById('confBody').textContent=body||'영구 삭제되며 되돌릴 수 없습니다.';
+    openModal('confirmModal');
+  }
+  document.addEventListener('click',e=>{
+    const a=e.target.closest('.admin-tag'); if(!a)return;
+    const txt=a.textContent;
+    if(a.classList.contains('admin-del')){
+      const onCostume=document.getElementById('costumes').classList.contains('active');
+      openConfirm(onCostume?'이 의상을 삭제할까요?':'이 항목을 삭제할까요?');
+      return;
+    }
+    if(document.getElementById('costumes').classList.contains('active')) openModal('editCostumeModal');
+    else {
+      document.getElementById('epTitle').textContent=txt.includes('＋')?'프로젝트 추가':'프로젝트 수정';
+      openModal('editProjectModal');
+    }
+  });
+
+  // lightbox — 감상 전용 (좋아요/댓글 없음)
+  let lbIdx=0,lbTotal=0;
+  function openLb(i,total){lbIdx=i;lbTotal=total;renderLb();document.getElementById('lb').classList.add('open');}
+  function closeLb(){document.getElementById('lb').classList.remove('open');}
+  function stepLb(d){lbIdx=(lbIdx+d+lbTotal)%lbTotal;renderLb();}
+  function renderLb(){document.getElementById('lbCount').textContent=(lbIdx+1)+' / '+lbTotal+' · ←/→ 넘김';}
+  document.addEventListener('keydown',e=>{
+    if(!document.getElementById('lb').classList.contains('open'))return;
+    if(e.key==='ArrowLeft')stepLb(-1);
+    if(e.key==='ArrowRight')stepLb(1);
+    if(e.key==='Escape')closeLb();
+  });
+
+  // 프로젝트 단위 좋아요 · 댓글 (사진 상세 아님)
+  let pjLikes=0,pjLiked=false;
+  const pjComments=[];
+  function pjLike(){pjLikes++;pjLiked=true;renderPj();}
+  function pjAdd(){
+    const nick=document.getElementById('pjNick').value.trim();
+    const pwd=document.getElementById('pjPwd').value;
+    const body=document.getElementById('pjBody').value.trim();
+    if(!nick||!pwd||!body){alert('닉네임·비밀번호·내용을 입력하세요 (목업)');return;}
+    pjComments.push({nick,pwd,body,date:'방금'});
+    document.getElementById('pjNick').value='';document.getElementById('pjPwd').value='';document.getElementById('pjBody').value='';
+    renderPj();
+  }
+  function pjDel(i){
+    if(document.body.classList.contains('admin')){pjComments.splice(i,1);renderPj();return;}
+    const pwd=prompt('삭제하려면 작성 시 입력한 비밀번호를 입력하세요'); if(pwd===null)return;
+    if(pwd===pjComments[i].pwd){pjComments.splice(i,1);renderPj();}else alert('비밀번호가 일치하지 않습니다');
+  }
+  function pjEdit(i){
+    const pwd=prompt('수정하려면 비밀번호를 입력하세요'); if(pwd===null)return;
+    if(pwd!==pjComments[i].pwd){alert('비밀번호가 일치하지 않습니다');return;}
+    const nb=prompt('수정할 내용',pjComments[i].body); if(nb!==null){pjComments[i].body=nb;renderPj();}
+  }
+  function renderPj(){
+    const lc=document.getElementById('pjLikeCount'); if(lc){lc.textContent=pjLikes;
+      document.getElementById('pjLikeBtn').classList.toggle('liked',pjLiked);}
+    const el=document.getElementById('pjClist'); if(!el)return;
+    const admin=document.body.classList.contains('admin');
+    el.innerHTML=pjComments.length? pjComments.map((c,i)=>`<div class="citem">
+      <div class="top"><span class="nm">${c.nick}</span>
+        <span class="acts"><span onclick="pjEdit(${i})">수정</span>
+        <span class="del" title="삭제" onclick="pjDel(${i})">✕${admin?' 관리자':''}</span></span></div>
+      <div class="muted">${c.body}</div>
+      <div class="dim" style="font-size:11px">${c.date}</div></div>`).join('')
+      : '<div class="dim" style="font-size:12px">이 프로젝트에 첫 댓글을 남겨보세요.</div>';
+  }
+  renderPj();
+</script>
+</body>
+</html>

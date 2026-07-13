@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>가격 UI — O1×O3 하이브리드 · 사이즈 검토</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{--bg:#0b0d0e;--bg2:#121517;--line:rgba(255,255,255,.11);--line2:rgba(255,255,255,.2);
+    --tx:#ece9e3;--tx2:rgba(236,233,227,.6);--tx3:rgba(236,233,227,.36);--ac:#7cc4d3;
+    --arch:'Archivo',sans-serif;--kr:'Pretendard',sans-serif;--serif:'Archivo','Pretendard',sans-serif}
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--bg);color:var(--tx);font-family:var(--kr);font-weight:300;padding:44px 32px 90px;max-width:1040px;margin:0 auto}
+  .lead h1{font-weight:600;font-size:20px;letter-spacing:-.01em}
+  .lead p{color:var(--tx2);font-size:14px;margin-top:6px}
+  .opt{font-family:'Archivo';font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ac);margin:38px 0 12px}
+
+  .ph{position:relative;overflow:hidden}
+  .ph::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 0%,transparent 55%,rgba(0,0,0,.4))}
+  .g1{background:linear-gradient(155deg,#08202c,#0f465b 60%,#08202c)}
+
+  .prod{display:grid;grid-template-columns:1.1fr 1fr;border:1px solid var(--line);overflow:hidden;background:var(--bg2)}
+  .prod .imgside .ph{width:100%;height:100%;min-height:360px}
+  .prod .body{padding:46px 44px}
+  .pt{font-family:var(--serif);font-weight:600;font-size:28px;letter-spacing:-.02em}
+  .psub{color:var(--tx2);margin:8px 0 26px;font-size:15px}
+  .pfeat{list-style:none;padding:0;margin:0 0 30px}
+  .pfeat li{padding:12px 0;border-top:1px solid var(--line);font-size:14px;color:var(--tx2);display:flex;gap:12px}
+  .pfeat li::before{content:"";width:5px;height:5px;background:var(--ac);border-radius:50%;margin-top:9px;flex:none}
+  .pnote{font-size:12px;color:var(--tx3);margin-top:10px}
+
+  /* O1×O3 hybrid: Fraunces numeral + small Archivo currency, em-scaled */
+  .price{font-family:'Fraunces',serif;font-weight:400;line-height:1;display:inline-flex;align-items:flex-start;gap:.18em;letter-spacing:0}
+  .price .cur{font-family:var(--arch);font-weight:400;color:var(--tx2);font-size:.34em;margin-top:.42em;letter-spacing:.02em}
+  .s40{font-size:40px}.s32{font-size:32px}.s28{font-size:28px}.s24{font-size:24px}.s20{font-size:20px}
+
+  .strip{border:1px solid var(--line);background:var(--bg2);padding:30px 34px;display:flex;gap:44px;flex-wrap:wrap;align-items:flex-end}
+  .cell{display:flex;flex-direction:column;gap:12px}
+  .cell .cap{font-family:'Archivo';font-size:11px;letter-spacing:.1em;color:var(--tx3)}
+  .reco{color:var(--ac)}
+</style>
+</head>
+<body>
+<div class="lead">
+  <h1>가격 UI — O1×O3 하이브리드 (세리프 숫자 + 작은 통화), 사이즈 축소 검토</h1>
+  <p>Fraunces 숫자 + 작은 Archivo ₩. 아래 카드는 28px 적용본, 하단 스트립에서 40→20px 비교.</p>
+</div>
+
+<div class="opt">카드 적용 — 28px (추천 크기)</div>
+<div class="prod">
+  <div class="imgside"><div class="ph g1"></div></div>
+  <div class="body">
+    <div class="pt">PREMIUM COURSE</div>
+    <div class="psub">환상적인 드레스, 고난도의 연출</div>
+    <ul class="pfeat">
+      <li>드레스 / 셔츠 / 코스프레</li>
+      <li>1인 / 2인 커플 또는 우정 촬영</li>
+      <li>의상 개인 준비 (의상 대여 가능, 유료)</li>
+      <li>안전하고 완벽한 촬영을 위한 헬퍼</li>
+    </ul>
+    <div class="price s28">350,000<span class="cur">₩</span></div>
+    <div class="pnote">※ 헬퍼 기본 포함</div>
+    <div class="pnote">※ 포프라자 / 딥스테이션 / MS다이빙풀 중 택일</div>
+  </div>
+</div>
+
+<div class="opt">사이즈 비교 스트립</div>
+<div class="strip">
+  <div class="cell"><span class="cap">40px (기존급)</span><div class="price s40">350,000<span class="cur">₩</span></div></div>
+  <div class="cell"><span class="cap">32px</span><div class="price s32">350,000<span class="cur">₩</span></div></div>
+  <div class="cell"><span class="cap reco">28px · 추천</span><div class="price s28">350,000<span class="cur">₩</span></div></div>
+  <div class="cell"><span class="cap">24px</span><div class="price s24">350,000<span class="cur">₩</span></div></div>
+  <div class="cell"><span class="cap">20px</span><div class="price s20">350,000<span class="cur">₩</span></div></div>
+</div>
+</body>
+</html>
