@@ -20,10 +20,10 @@ export default function Error({
       <p className="font-[family-name:var(--font-en)] text-[11px] tracking-[0.4em] uppercase text-accent mb-5">
         Error
       </p>
-      <h1 className="font-[family-name:var(--font-en)] font-semibold text-[clamp(26px,3.6vw,42px)] tracking-[-0.02em]">
+      <h1 className="font-medium text-[clamp(19px,2.2vw,24px)] tracking-[-0.01em]">
         문제가 발생했습니다
       </h1>
-      <p className="text-tx2 mt-4 max-w-[380px]">
+      <p className="text-tx2 mt-3 text-sm max-w-[380px]">
         잠시 후 다시 시도해 주세요. 계속되면 새로고침 해보세요.
       </p>
       <div className="flex gap-3 mt-9">
