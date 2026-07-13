@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { mediaUrl } from "@/lib/media";
 import type { Category, ProjectType } from "@/lib/gallery";
@@ -58,7 +59,10 @@ function toImage(i: {
   };
 }
 
-export async function getProject(slug: string): Promise<ProjectDetail | null> {
+// cache(): generateMetadata + 페이지 본문이 같은 요청에서 두 번 불러도 조회는 1번.
+export const getProject = cache(async (
+  slug: string,
+): Promise<ProjectDetail | null> => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("projects")
@@ -97,7 +101,7 @@ export async function getProject(slug: string): Promise<ProjectDetail | null> {
     cover: cover ? toImage(cover) : null,
     images: imgs.map(toImage),
   };
-}
+});
 
 export function categoryLabel(c: Category): string {
   return CATEGORY_LABEL[c];

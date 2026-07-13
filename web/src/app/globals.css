@@ -1,5 +1,7 @@
 @import "tailwindcss";
-@import "pretendard/dist/web/static/pretendard.css";
+/* dynamic-subset: 페이지에 실제 등장하는 글리프 조각(~18KB)만 다운로드
+   (기존 static은 굵기당 ~760KB 전체 다운로드 → 첫 페인트 지연 주범) */
+@import "pretendard/dist/web/static/pretendard-dynamic-subset.css";
 
 /* ============================================
    TOM IN THE WATER — design tokens
