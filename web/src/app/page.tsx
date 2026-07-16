@@ -1,5 +1,6 @@
 // 홈 — 히어로 + Featured Work (콘텐츠는 이 두 섹션만, docs/01 §2.1)
 import Link from "next/link";
+import Image from "next/image";
 import Reveal from "@/components/Reveal";
 import { getFeatured, getFeaturableProjects } from "@/lib/featured";
 import { getAdmin } from "@/lib/auth";
@@ -12,11 +13,22 @@ export default async function Home() {
 
   return (
     <>
-      {/* 히어로 — 이미지가 무대. 실제 배경(영상/대표작)은 M2에서 */}
-      <section className="relative h-screen min-h-[620px] overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(155deg,#08202c,#0f465b_60%,#08202c)] animate-[heroDrift_22s_ease-in-out_infinite_alternate]" />
+      {/* 히어로 — 배경 사진이 무대 (인물 상단 고정 · full-bleed) */}
+      <section className="relative h-screen min-h-[620px] overflow-hidden bg-[#08202c]">
+        <Image
+          src="/hero/mermaid-hero.jpg"
+          alt="깊은 바다 협곡에 앉은 인어 — TOM in the water"
+          fill
+          priority
+          sizes="100vw"
+          quality={85}
+          className="object-cover object-[50%_30%]"
+        />
+        {/* 상단 비네트 + 텍스트 가독성/시네마틱 오버레이 */}
         <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_0%,transparent_55%,rgba(0,0,0,0.45))]" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,13,14,0.55)_0%,transparent_26%,transparent_46%,rgba(11,13,14,0.5)_78%,rgba(11,13,14,0.96)_100%),linear-gradient(90deg,rgba(11,13,14,0.5),transparent_42%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,13,14,0.5)_0%,transparent_26%,transparent_46%,rgba(11,13,14,0.5)_72%,rgba(11,13,14,0.99)_100%),linear-gradient(90deg,rgba(11,13,14,0.5),transparent_44%)]" />
+        {/* 하단 솔리드 페이드 — 사진 워터마크 마스킹 + 다음 섹션 연결 (모바일 가독성) */}
+        <div className="absolute inset-x-0 bottom-0 h-[22%] bg-[linear-gradient(0deg,var(--bg)_2%,transparent)]" />
 
         <div className="absolute left-0 right-0 bottom-[8vh] z-[2]">
           <div className="max-w-[1180px] mx-auto px-8">
