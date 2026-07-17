@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import type { ProjectImage } from "@/lib/project";
 
-// 이미지 타일(Masonry 2열) + 감상 전용 라이트박스 (좋아요/댓글 없음, docs §2.4)
+// 이미지 타일(2열 그리드, 가로 순서대로 좌→우 채움) + 감상 전용 라이트박스 (좋아요/댓글 없음, docs §2.4)
 export default function ProjectImages({ images }: { images: ProjectImage[] }) {
   const [open, setOpen] = useState<number | null>(null);
   const total = images.length;
@@ -35,13 +35,13 @@ export default function ProjectImages({ images }: { images: ProjectImage[] }) {
 
   return (
     <>
-      <div className="[column-count:2] [column-gap:12px] max-[780px]:[column-count:1]">
+      <div className="grid grid-cols-2 gap-3 max-[780px]:grid-cols-1">
         {images.map((img, i) => (
           <button
             key={i}
             type="button"
             onClick={() => setOpen(i)}
-            className="block w-full mb-3 break-inside-avoid cursor-zoom-in overflow-hidden"
+            className="block w-full self-start cursor-zoom-in overflow-hidden"
           >
             <Image
               src={img.url}
