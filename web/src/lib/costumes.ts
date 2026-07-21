@@ -4,6 +4,7 @@ import {
   COSTUME_TYPES,
   COSTUME_SIZES,
   COSTUME_COURSES,
+  sortColors,
   type CostumeType,
 } from "@/lib/costume-meta";
 
@@ -15,6 +16,9 @@ export {
   typeLabel,
   courseLabel,
   priceText,
+  priceAmount,
+  colorSwatch,
+  sortColors,
 } from "@/lib/costume-meta";
 
 export type Costume = {
@@ -37,6 +41,7 @@ export type CostumeFilters = {
   type?: string;
   size?: string;
   course?: string;
+  color?: string;
 };
 
 /** 공개 의상 목록 (+ 선택 필터). RLS: published or admin. */
@@ -53,6 +58,7 @@ export async function getCostumes(f: CostumeFilters = {}): Promise<Costume[]> {
   if (f.type) q = q.eq("type", f.type);
   if (f.size) q = q.contains("sizes", [f.size]);
   if (f.course) q = q.contains("courses", [f.course]);
+  if (f.color) q = q.contains("colors", [f.color]);
 
   const { data } = await q.returns<Row[]>();
   return (data ?? []).map((r) => ({
@@ -66,25 +72,31 @@ export async function getCostumeFacets(): Promise<{
   types: string[];
   sizes: string[];
   courses: string[];
+  colors: string[];
 }> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("costumes")
-    .select("type,sizes,courses")
+    .select("type,sizes,courses,colors")
     .eq("published", true)
-    .returns<{ type: string; sizes: string[]; courses: string[] }[]>();
+    .returns<
+      { type: string; sizes: string[]; courses: string[]; colors: string[] }[]
+    >();
   const rows = data ?? [];
   const types = new Set<string>();
   const sizes = new Set<string>();
   const courses = new Set<string>();
+  const colors = new Set<string>();
   for (const r of rows) {
     types.add(r.type);
     (r.sizes ?? []).forEach((s) => sizes.add(s));
     (r.courses ?? []).forEach((c) => courses.add(c));
+    (r.colors ?? []).forEach((c) => colors.add(c));
   }
   return {
     types: COSTUME_TYPES.map((t) => t.key).filter((k) => types.has(k)),
     sizes: [...COSTUME_SIZES].filter((s) => sizes.has(s)),
     courses: COSTUME_COURSES.map((c) => c.key).filter((k) => courses.has(k)),
+    colors: sortColors([...colors]),
   };
 }

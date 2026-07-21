@@ -6,7 +6,9 @@ import {
   getCostumeFacets,
   typeLabel,
   courseLabel,
-  priceText,
+  priceAmount,
+  colorSwatch,
+  sortColors,
   COSTUME_TYPES,
   COSTUME_SIZES,
   COSTUME_COURSES,
@@ -22,7 +24,7 @@ export const metadata: Metadata = {
   description: "수중 촬영 의상 대여 카탈로그 — 드레스 · 머메이드 테일 · 컨셉 의상.",
 };
 
-type SP = { type?: string; size?: string; course?: string };
+type SP = { type?: string; size?: string; course?: string; color?: string };
 
 function href(patch: Partial<SP>, base: SP): string {
   const m = { ...base, ...patch };
@@ -30,6 +32,7 @@ function href(patch: Partial<SP>, base: SP): string {
   if (m.type) qs.set("type", m.type);
   if (m.size) qs.set("size", m.size);
   if (m.course) qs.set("course", m.course);
+  if (m.color) qs.set("color", m.color);
   const s = qs.toString();
   return s ? `/costumes?${s}` : "/costumes";
 }
@@ -44,6 +47,7 @@ export default async function CostumesPage({
     type: sp.type || undefined,
     size: sp.size || undefined,
     course: sp.course || undefined,
+    color: sp.color || undefined,
   };
 
   const [items, facets, admin] = await Promise.all([
@@ -52,7 +56,7 @@ export default async function CostumesPage({
     getAdmin(),
   ]);
 
-  const isFiltered = !!(base.type || base.size || base.course);
+  const isFiltered = !!(base.type || base.size || base.course || base.color);
   const hasCatalog =
     items.length > 0 || isFiltered || facets.types.length > 0;
 
@@ -121,6 +125,18 @@ export default async function CostumesPage({
                   }),
                 )}
               />
+              <FilterRow
+                label="색상"
+                items={facets.colors.map((col) => ({
+                  label: col,
+                  href: href(
+                    { color: base.color === col ? undefined : col },
+                    base,
+                  ),
+                  on: base.color === col,
+                  swatch: colorSwatch(col),
+                }))}
+              />
               {isFiltered && (
                 <Link
                   href="/costumes"
@@ -136,9 +152,9 @@ export default async function CostumesPage({
                 해당 조건의 의상이 없습니다.
               </p>
             ) : (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
                 {items.map((c, i) => (
-                  <Reveal key={c.id} delay={Math.min(i, 5) * 70}>
+                  <Reveal key={c.id} delay={Math.min(i, 7) * 40}>
                     <CostumeCard costume={c} />
                   </Reveal>
                 ))}
@@ -156,7 +172,7 @@ function FilterRow({
   items,
 }: {
   label: string;
-  items: { label: string; href: string; on: boolean }[];
+  items: { label: string; href: string; on: boolean; swatch?: string }[];
 }) {
   if (items.length === 0) return null;
   return (
@@ -168,12 +184,18 @@ function FilterRow({
         <Link
           key={it.label}
           href={it.href}
-          className={`text-[11px] tracking-[0.06em] border px-3 py-[6px] transition-colors ${
+          className={`inline-flex items-center gap-1.5 text-[11px] tracking-[0.06em] border px-3 py-[6px] transition-colors ${
             it.on
               ? "text-tx border-line2 bg-white/[0.04]"
               : "text-tx3 border-line hover:text-tx hover:border-line2"
           }`}
         >
+          {it.swatch && (
+            <span
+              className="w-2.5 h-2.5 rounded-full border border-line2"
+              style={{ background: it.swatch }}
+            />
+          )}
           {it.label}
         </Link>
       ))}
@@ -205,39 +227,37 @@ function CostumeCard({ costume: c }: { costume: Costume }) {
         )}
       </Lightbox>
 
-      <div className="p-5 flex flex-col flex-1">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-tx text-[15px] font-[400]">{c.name}</h3>
-          <span className="font-en text-[13px] text-accent whitespace-nowrap">
-            {priceText(c.price)}
+      <div className="p-3.5 flex flex-col flex-1">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-tx3 text-[11px]">
+            {typeLabel(c.type)}
+            {c.sizes.length > 0 && ` · ${c.sizes.join("/")}`}
+          </p>
+          <span className="font-en text-[13px] text-tx whitespace-nowrap flex items-start gap-[0.1em]">
+            {priceAmount(c.price)}
+            <span className="text-[0.68em] text-tx2 mt-[0.15em]">₩</span>
           </span>
         </div>
-        <p className="text-tx3 text-[12px] mt-1">
-          {typeLabel(c.type)}
-          {c.sizes.length > 0 && ` · ${c.sizes.join("/")}`}
-        </p>
         {c.colors.length > 0 && (
-          <div className="flex gap-1.5 mt-3">
-            {c.colors.map((col) => (
+          <div className="flex gap-1.5 mt-2.5">
+            {sortColors(c.colors).map((col) => (
               <span
                 key={col}
                 title={col}
-                className="w-3.5 h-3.5 rounded-full border border-line2"
-                style={{ background: /^#/.test(col) ? col : undefined }}
+                className="w-3 h-3 rounded-full border border-line2"
+                style={{ background: colorSwatch(col) }}
               >
-                {!/^#/.test(col) && (
-                  <span className="sr-only">{col}</span>
-                )}
+                <span className="sr-only">{col}</span>
               </span>
             ))}
           </div>
         )}
         {c.courses.length > 0 && (
-          <div className="flex gap-1.5 flex-wrap mt-3">
+          <div className="flex gap-1 flex-wrap mt-2.5">
             {c.courses.map((co) => (
               <span
                 key={co}
-                className="text-[10px] tracking-[0.08em] uppercase text-tx3 border border-line px-2 py-[3px]"
+                className="text-[9px] tracking-[0.06em] uppercase text-tx3 border border-line px-1.5 py-[2px]"
               >
                 {courseLabel(co)}
               </span>
