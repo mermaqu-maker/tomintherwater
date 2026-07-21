@@ -43,6 +43,19 @@ export function priceAmount(price: number): string {
   return price.toLocaleString("ko-KR");
 }
 
+// 사이즈 배열 → 최소~최대 범위 표기 (예: ['44','55','66'] → '44~66').
+export function sizeRange(sizes: string[]): string {
+  const nums = sizes
+    .filter((s) => /^\d+$/.test(s))
+    .map(Number)
+    .sort((a, b) => a - b);
+  const parts: string[] = [];
+  if (nums.length === 1) parts.push(String(nums[0]));
+  else if (nums.length > 1) parts.push(`${nums[0]}~${nums[nums.length - 1]}`);
+  if (sizes.includes("FREE")) parts.push("FREE");
+  return parts.join(" · ");
+}
+
 // 색명 → 스와치 hex. 등록 색상은 자유 텍스트라, 알려진 색만 점으로 표시.
 export const COLOR_HEX: Record<string, string> = {
   화이트: "#f1f0ec",

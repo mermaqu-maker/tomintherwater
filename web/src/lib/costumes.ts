@@ -17,6 +17,7 @@ export {
   courseLabel,
   priceText,
   priceAmount,
+  sizeRange,
   colorSwatch,
   sortColors,
 } from "@/lib/costume-meta";

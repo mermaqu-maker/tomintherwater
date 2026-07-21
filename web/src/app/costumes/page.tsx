@@ -7,6 +7,7 @@ import {
   typeLabel,
   courseLabel,
   priceAmount,
+  sizeRange,
   colorSwatch,
   sortColors,
   COSTUME_TYPES,
@@ -228,16 +229,16 @@ function CostumeCard({ costume: c }: { costume: Costume }) {
       </Lightbox>
 
       <div className="p-3.5 flex flex-col flex-1">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-tx3 text-[11px]">
-            {typeLabel(c.type)}
-            {c.sizes.length > 0 && ` · ${c.sizes.join("/")}`}
-          </p>
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-tx text-[15px] font-[400]">{typeLabel(c.type)}</h3>
           <span className="font-en text-[13px] text-tx whitespace-nowrap flex items-start gap-[0.1em]">
             {priceAmount(c.price)}
             <span className="text-[0.68em] text-tx2 mt-[0.15em]">₩</span>
           </span>
         </div>
+        {c.sizes.length > 0 && (
+          <p className="text-tx text-[12px] mt-1">{sizeRange(c.sizes)}</p>
+        )}
         {c.colors.length > 0 && (
           <div className="flex gap-1.5 mt-2.5">
             {sortColors(c.colors).map((col) => (
