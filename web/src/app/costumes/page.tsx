@@ -93,7 +93,7 @@ export default async function CostumesPage({
         ) : (
           <>
             {/* 필터 (존재하는 값만) */}
-            <div className="flex flex-col items-center gap-3 mt-9 mb-12">
+            <div className="flex flex-col items-start gap-3 mt-9 mb-12 pl-1">
               <FilterRow
                 label="유형"
                 items={COSTUME_TYPES.filter((t) => facets.types.includes(t.key)).map(
@@ -176,7 +176,7 @@ function FilterRow({
 }) {
   if (items.length === 0) return null;
   return (
-    <div className="flex items-center gap-2 flex-wrap justify-center">
+    <div className="flex items-center gap-2 flex-wrap justify-start">
       <span className="font-en text-[10px] tracking-[0.2em] uppercase text-tx3 w-14 text-right">
         {label}
       </span>
