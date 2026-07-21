@@ -50,6 +50,7 @@ export const COLOR_HEX: Record<string, string> = {
   퍼플: "#7c5cbf",
   핑크: "#e58fb5",
   블루: "#4f83c4",
+  청록: "#2b9ca0",
   옐로우: "#e6c34a",
   레드: "#c34a44",
   그린: "#4a9d6e",
