@@ -4,7 +4,6 @@ import Image from "next/image";
 import {
   getCostumes,
   getCostumeFacets,
-  typeLabel,
   courseLabel,
   priceAmount,
   sizeRange,
@@ -226,32 +225,29 @@ function CostumeCard({ costume: c }: { costume: Costume }) {
             대여중
           </span>
         )}
-      </Lightbox>
-
-      <div className="p-3.5 flex flex-col flex-1">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-tx text-[15px] font-[400]">{typeLabel(c.type)}</h3>
-          <span className="font-en text-[13px] text-tx whitespace-nowrap flex items-start gap-[0.1em]">
-            {priceAmount(c.price)}
-            <span className="text-[0.68em] text-tx2 mt-[0.15em]">₩</span>
-          </span>
-        </div>
-        {c.sizes.length > 0 && (
-          <p className="text-tx text-[12px] mt-1">{sizeRange(c.sizes)}</p>
-        )}
         {c.colors.length > 0 && (
-          <div className="flex gap-1.5 mt-2.5">
+          <div className="absolute top-3 right-3 flex gap-1 rounded-full bg-[rgba(4,10,12,0.5)] px-1.5 py-1 backdrop-blur-sm">
             {sortColors(c.colors).map((col) => (
               <span
                 key={col}
                 title={col}
-                className="w-3 h-3 rounded-full border border-line2"
+                className="w-3 h-3 rounded-full border border-white/25"
                 style={{ background: colorSwatch(col) }}
               >
                 <span className="sr-only">{col}</span>
               </span>
             ))}
           </div>
+        )}
+      </Lightbox>
+
+      <div className="p-3.5 flex flex-col flex-1">
+        <span className="font-en text-[15px] text-tx whitespace-nowrap flex items-start gap-[0.1em]">
+          {priceAmount(c.price)}
+          <span className="text-[0.68em] text-tx2 mt-[0.15em]">₩</span>
+        </span>
+        {c.sizes.length > 0 && (
+          <p className="text-tx text-[12px] mt-1">{sizeRange(c.sizes)}</p>
         )}
         {c.courses.length > 0 && (
           <div className="flex gap-1 flex-wrap mt-2.5">
