@@ -82,8 +82,7 @@ export default async function CostumesPage({
             의상 대여
           </h1>
           <p className="text-tx3 text-sm mt-3 max-w-[460px] mx-auto">
-            촬영에 필요한 의상을 유료로 대여할 수 있습니다. 예약·상담은 카카오톡
-            채널로 문의해 주세요.
+            촬영에 필요한 의상을 유료로 대여할 수 있습니다.
           </p>
         </div>
 
@@ -178,7 +177,7 @@ function FilterRow({
   if (items.length === 0) return null;
   return (
     <div className="flex items-center gap-2 flex-wrap justify-start">
-      <span className="font-en text-[10px] tracking-[0.2em] uppercase text-tx3 w-14 text-right">
+      <span className="text-[13px] tracking-[0.06em] text-tx w-16 text-right">
         {label}
       </span>
       {items.map((it) => (
