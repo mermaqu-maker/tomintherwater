@@ -9,7 +9,6 @@ import {
   priceAmount,
   sizeRange,
   colorSwatch,
-  sortColors,
   COSTUME_TYPES,
   COSTUME_SIZES,
   COSTUME_COURSES,
@@ -82,7 +81,7 @@ export default async function CostumesPage({
             의상 대여
           </h1>
           <p className="text-tx3 text-sm mt-3 max-w-[460px] mx-auto">
-            촬영에 필요한 의상을 유료로 대여할 수 있습니다.
+            촬영에 필요한 의상을 대여할 수 있습니다.
           </p>
         </div>
 
@@ -176,29 +175,31 @@ function FilterRow({
 }) {
   if (items.length === 0) return null;
   return (
-    <div className="flex items-center gap-2 flex-wrap justify-start">
-      <span className="text-[13px] tracking-[0.06em] text-tx w-16 text-right">
+    <div className="flex items-start gap-2 w-full">
+      <span className="text-[13px] tracking-[0.06em] text-tx w-16 text-right shrink-0 pt-[6px]">
         {label}
       </span>
-      {items.map((it) => (
-        <Link
-          key={it.label}
-          href={it.href}
-          className={`inline-flex items-center gap-1.5 text-[11px] tracking-[0.06em] border px-3 py-[6px] transition-colors ${
-            it.on
-              ? "text-tx border-line2 bg-white/[0.04]"
-              : "text-tx3 border-line hover:text-tx hover:border-line2"
-          }`}
-        >
-          {it.swatch && (
-            <span
-              className="w-2.5 h-2.5 rounded-full border border-line2"
-              style={{ background: it.swatch }}
-            />
-          )}
-          {it.label}
-        </Link>
-      ))}
+      <div className="flex flex-wrap gap-2 flex-1">
+        {items.map((it) => (
+          <Link
+            key={it.label}
+            href={it.href}
+            className={`inline-flex items-center gap-1.5 text-[11px] tracking-[0.06em] border px-3 py-[6px] transition-colors ${
+              it.on
+                ? "text-tx border-line2 bg-white/[0.04]"
+                : "text-tx3 border-line hover:text-tx hover:border-line2"
+            }`}
+          >
+            {it.swatch && (
+              <span
+                className="w-2.5 h-2.5 rounded-full border border-line2"
+                style={{ background: it.swatch }}
+              />
+            )}
+            {it.label}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
@@ -224,20 +225,6 @@ function CostumeCard({ costume: c }: { costume: Costume }) {
           <span className="absolute top-3 left-3 text-[10px] tracking-[0.16em] uppercase bg-[rgba(4,10,12,0.75)] text-tx2 px-2.5 py-1">
             대여중
           </span>
-        )}
-        {c.colors.length > 0 && (
-          <div className="absolute bottom-3 right-3 flex gap-1.5">
-            {sortColors(c.colors).map((col) => (
-              <span
-                key={col}
-                title={col}
-                className="w-3.5 h-3.5 rounded-full border border-white/70 shadow-[0_1px_3px_rgba(0,0,0,0.4)]"
-                style={{ background: colorSwatch(col) }}
-              >
-                <span className="sr-only">{col}</span>
-              </span>
-            ))}
-          </div>
         )}
       </Lightbox>
 
